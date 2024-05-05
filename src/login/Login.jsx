@@ -7,8 +7,6 @@ function Login(){
     const [fields, setFields] = useState(['','',''])
     const labels = ["Email address","Username","Password"];
 
-    const [loginName, setLoginName] = useState("")
-
     function inputChange(e, i){
         console.log(i)
         setFields(prev=>{
@@ -43,9 +41,9 @@ function Login(){
                     <Input key={i} style={style} index={i} c={[fields,setFields]} field={fields} pressed={pressed} name={n} focusHandler={()=>focusHandler(i)} onClickOutside={()=>onClickOutsideHandler(i)}/>
                 )
             }
-            {/* <Input style={style} pressed={pressed} name={labels[1]} inputChange={inputChange} loginName={loginName} focusHandler={focusHandler} onClickOutside={onClickOutsideHandler}/>
-            <Input style={style} pressed={pressed} name={labels[2]} inputChange={inputChange} loginName={loginName} focusHandler={focusHandler} onClickOutside={onClickOutsideHandler}/> */}
-            
+            <div className={style.buttons}>
+
+            </div>
         </div>
     )
 }
