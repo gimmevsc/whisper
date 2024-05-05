@@ -6,6 +6,8 @@
     padding: 50px;
     .logo{
         margin-bottom: 150px;
+        pointer-events: none;
+        user-select: none;
     }
     .title{
         margin: 0;
