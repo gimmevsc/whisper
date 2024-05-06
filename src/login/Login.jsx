@@ -5,7 +5,7 @@ import Input from "./Input";
 function Login(){
     const [pressed, setPressed] = useState([false,false,false])
     const [fields, setFields] = useState(['','',''])
-    const labels = ["Email address","Username","Password"];
+    const labels = [["Email address",'text'],["Username",'text'],["Password",'password']];
 
     function inputChange(e, i){
         console.log(i)
@@ -38,11 +38,19 @@ function Login(){
             <div className={style.create_text}>Create your account here</div>
             {
                 labels.map((n,i)=>
-                    <Input key={i} style={style} index={i} c={[fields,setFields]} field={fields} pressed={pressed} name={n} focusHandler={()=>focusHandler(i)} onClickOutside={()=>onClickOutsideHandler(i)}/>
+                    <Input key={i} style={style} index={i} c={[fields,setFields]} field={fields} pressed={pressed} name={n[0]} inputType={n[1]} focusHandler={()=>focusHandler(i)} onClickOutside={()=>onClickOutsideHandler(i)}/>
                 )
             }
             <div className={style.buttons}>
-
+                <button className={style.register_btn}>
+                    Register
+                </button>
+                <div className={style.text}>
+                    Have an account?
+                </div>
+                <button className={style.login_btn}>
+                    Login
+                </button>
             </div>
         </div>
     )
