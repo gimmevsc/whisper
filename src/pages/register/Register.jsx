@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState } from "react";
-import logo from "../assets/logo.svg"
-import style from "./login.module.scss"
-import Input from "./Input";
-function Login(){
+import logo from "../../assets/logo.svg"
+import style from "./register.module.scss"
+import Input from "../../components/Input";
+import { Link,useNavigate } from "react-router-dom";
+function Register(){
+    const navigate = useNavigate()
+    const [isAnimation,setIsAnimation] = useState(false)
     const [pressed, setPressed] = useState([false,false,false])
     const [fields, setFields] = useState(['','',''])
     const labels = [["Email address",'text'],["Username",'text'],["Password",'password']];
 
-    function inputChange(e, i){
-        console.log(i)
-        setFields(prev=>{
-            prev[i] = e.target.value
-            console.log(prev)
-            return prev.slice(0)
-        });
-        // if(e.target.value.length ==0 && pressed )setPressed(false)
+    function toRegisterHandler(){
+        setIsAnimation(true)
+        setTimeout(() => {
+            navigate("/login")
+        }, 250);
     }
     function focusHandler(i){
         
@@ -31,7 +31,7 @@ function Login(){
         console.log(fields[0])
     },[ fields,pressed])
     return(
-        <div className={style.login}>
+        <div className={style.register}>
             <img src={logo} alt="" className={style.logo}/>
 
             <h1 className={style.title}>Get Started Now!</h1>
@@ -42,18 +42,22 @@ function Login(){
                 )
             }
             <div className={style.buttons}>
-                <button className={style.register_btn}>
+                <button className={`${style.register_btn} ${isAnimation&&style.button_above}`}>
                     Register
                 </button>
                 <div className={style.text}>
                     Have an account?
                 </div>
-                <button className={style.login_btn}>
-                    Login
-                </button>
+                
+                
+                <button className={`${style.login_btn} ${isAnimation&&style.button_below}`} onClick={toRegisterHandler}>
+                        Login
+                    </button>
+                
+                
             </div>
         </div>
     )
 }
 
-export default Login;
+export default Register;

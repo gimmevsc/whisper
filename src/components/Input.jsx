@@ -28,7 +28,7 @@ function Input(props) {
         };
     }, [onClickOutside]);
 
-
+ 
 
     return (
         <div className={style.input_wrapper} ref={ref} key={props.key}>
