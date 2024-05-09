@@ -8,8 +8,8 @@ def registerUser(request):
     
     if request.method == 'GET':
         
-        username = request.GET.get('username')
-        email_address = request.GET.get('email_address')
+        username = request.GET.get('username').lower()
+        email_address = request.GET.get('email_address').lower()
         password = request.GET.get('password')
 
         if username and email_address and password:
