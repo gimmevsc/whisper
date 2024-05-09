@@ -3,13 +3,23 @@ import logo from "../../assets/logo.svg"
 import style from "./register.module.scss"
 import Input from "../../components/Input";
 import { Link,useNavigate } from "react-router-dom";
+import axios from "axios";
 function Register(){
+    const HOST = "127.0.0.1"
     const navigate = useNavigate()
     const [isAnimation,setIsAnimation] = useState(false)
     const [pressed, setPressed] = useState([false,false,false])
     const [fields, setFields] = useState(['','',''])
     const labels = [["Email address",'text'],["Username",'text'],["Password",'password']];
 
+    function registerHandler(){
+        // const data = {
+        //     'email':fields[0],
+        //     'username':fields[1],
+        //     'password':fields[2]
+        // }
+        axios.get(`http://${HOST}:8000/register?email_address=${fields[0]}&username=${fields[1]}&password=${fields[2]}`).then(res=>res.data).then(res=>console.log(res)).catch(err=>console.log(err))
+    }
     function toRegisterHandler(){
         setIsAnimation(true)
         setTimeout(() => {
@@ -42,7 +52,7 @@ function Register(){
                 )
             }
             <div className={style.buttons}>
-                <button className={`${style.register_btn} ${isAnimation&&style.button_above}`}>
+                <button className={`${style.register_btn} ${isAnimation&&style.button_above}`} onClick={registerHandler}>
                     Register
                 </button>
                 <div className={style.text}>
