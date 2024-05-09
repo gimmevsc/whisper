@@ -1,11 +1,16 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
-def index(request):
+def registerUser(request):
     if request.GET:
         print(request.GET)
-    
-    return HttpResponse(f"{request.GET['name']} is cool")
+    username = request.GET.get('username', '')
+    password = request.GET.get('password', '')
+    response_data = {
+        'username': username,
+        'password': int(password)
+                     }
+    return JsonResponse(response_data)
 
 def categories(request, catid):
     return HttpResponse(f"<h1>Category {catid}</h1>")

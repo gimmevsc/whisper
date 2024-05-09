@@ -1,1 +1,3 @@
-venv1
+.venv
+db.sqlite3
+tables.txt
