@@ -2,7 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
 
-from back.whisper.register.models import User
+from register.models import User
 
 def registerUser(request):
     
@@ -29,7 +29,7 @@ def registerUser(request):
                         'type': 'username'
                     })
                 
-            user = User.objects.create_user(username=username, email=email_address, password=password, created_at=)
+            user = User.objects.create_user(username=username, email=email_address, password=password)
 
             user.created_at = timezone.now()
             user.updated_at = timezone.now()
