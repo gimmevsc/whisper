@@ -1,8 +1,15 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
+from re import match
 
-from register.models import User
+from .models import User
+
+def is_valid_email(email):
+    regex = r'^.+@.+$'
+    if match(regex, email):
+        return True
+    return False
 
 def registerUser(request):
     
@@ -11,28 +18,32 @@ def registerUser(request):
         username = request.GET.get('username').lower()
         email_address = request.GET.get('email_address').lower()
         password = request.GET.get('password')
-
+        
         if username and email_address and password:
             
-            if User.objects.filter(email=email_address).exists():
+            if User.objects.filter(email_address=email_address).exists():
                 return JsonResponse(
                     {
                         'status': 'error',
                         'message': 'Email address already exists',
-                        'type': 'email'
+                        'type': 'exist_email'
                     })
             
             if User.objects.filter(username=username).exists():
                 return JsonResponse(
                     {   'status': 'error',
                         'message': 'Username already exists',
-                        'type': 'username'
+                        'type': 'exist_username'
+                    })
+             
+            if not is_valid_email(email_address):
+                return JsonResponse(
+                    {   'status': 'error',
+                        'message': 'Invalid email address',
+                        'type': 'invalid_email'
                     })
                 
-            user = User.objects.create_user(username=username, email=email_address, password=password)
-
-            user.created_at = timezone.now()
-            user.updated_at = timezone.now()
+            user = User.objects.create(username=username, email_address=email_address, password=password)
             
             user.save()
 
@@ -43,13 +54,15 @@ def registerUser(request):
         else:
             return JsonResponse(
                 {
-                    'status': 'error'
+                    'status': 'error',
+                    'message': 'empty field'
                 })
 
     else:
         return JsonResponse(
                 {
-                    'status': 'error'
+                    'status': 'error',
+                    'message': 'bad request'
                 })
     
 def categories(request, catid):
