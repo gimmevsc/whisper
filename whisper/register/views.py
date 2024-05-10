@@ -1,5 +1,4 @@
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from re import match
 import json 
@@ -11,6 +10,7 @@ def is_valid_email(email):
     if match(regex, email):
         return True
     return False
+
 
 @csrf_exempt
 def registerUser(request):
@@ -63,18 +63,14 @@ def registerUser(request):
             return JsonResponse(
                 {
                     'status': 'error',
-                    'message': 'empty field'
+                    'message': 'Empty field',
+                    'type': 'empty_email'
                 })
 
     else:
         return JsonResponse(
                 {
                     'status': 'error',
-                    'message': 'bad request'
+                    'message': 'Bad request',
+                    'type': 'bad_request'
                 })
-    
-def categories(request, catid):
-    return HttpResponse(f"<h1>Category {catid}</h1>")
-
-# def pageNotFound(request, exception):
-#     return HttpResponseNotFound('<h1>Page Not Found</h1>')
