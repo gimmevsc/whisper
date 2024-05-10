@@ -1,7 +1,8 @@
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
-from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 from re import match
+import json 
 
 from .models import User
 
@@ -11,13 +12,20 @@ def is_valid_email(email):
         return True
     return False
 
+@csrf_exempt
 def registerUser(request):
     
-    if request.method == 'GET':
+    print(request.body)
+    
+    if request.method == 'POST':
         
-        username = request.GET.get('username').lower()
-        email_address = request.GET.get('email_address').lower()
-        password = request.GET.get('password')
+        data = json.loads(request.body.decode('utf-8'))
+        
+        email_address = data.get('email_address')
+        username = data.get('username')
+        password = data.get('password')
+        
+        print(email_address)
         
         if username and email_address and password:
             
@@ -42,7 +50,7 @@ def registerUser(request):
                         'message': 'Invalid email address',
                         'type': 'invalid_email'
                     })
-                
+            
             user = User.objects.create(username=username, email_address=email_address, password=password)
             
             user.save()

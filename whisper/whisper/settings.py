@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'register.apps.RegisterConfig',
+    'login.apps.LoginConfig',
     'corsheaders'
 ]
 
@@ -45,6 +46,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://192.168.31.234:3000'
 ]
+
+CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,11 +60,18 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.common.CommonMiddleware'
 ]
 CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'whisper.urls'
+
+SESSION_COOKIE_SECURE = True
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+SESSION_COOKIE_AGE = 7 * 24 * 60 * 60
 
 TEMPLATES = [
     {
