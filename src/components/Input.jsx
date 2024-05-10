@@ -31,13 +31,13 @@ function Input(props) {
  
 
     return (
-        <div className={style.input_wrapper} ref={ref} key={props.key}>
-            <input className={`${style.input} ${isPassword&&style.password}`} value={props.field[props.index]} type={isPassword ? isHide && "password" : "text"} onChange={(e) => { props.c[1](prev => { prev[props.index] = e.target.value; return prev.slice(0); }) }} onFocus={props.focusHandler} />
+        <div className={`${style.input_wrapper} ${props.isAnimation?style.move_input:""}`} ref={ref} key={props.key}>
+            <input className={`${style.input} ${isPassword?style.password:""}`} value={props.field[props.index]} type={isPassword ? isHide && "password" : "text"} onChange={(e) => { props.c[1](prev => { prev[props.index] = e.target.value; return prev.slice(0); }) }} onFocus={props.focusHandler} />
             <label htmlFor={style.input} className={`${style.placeholder} ${props.pressed[props.index] ? style.animation : ""}`}>{props.name}</label>
             {isPassword &&
                 <div onClick={passwordHandler} className={style.password_btn}>
-                        <img src={eye_open} className={isHide&&style.hidden} style={{top:"2px"}} alt="" />
-                        <img src={eye_close} className={!isHide&&style.hidden} alt="" />                    
+                        <img src={eye_open} className={isHide?style.hidden:""} style={{top:"2px"}} alt="" />
+                        <img src={eye_close} className={!isHide?style.hidden:""} alt="" />                    
                 </div>}
         </div>
     )

@@ -3,9 +3,10 @@ import logo from "../../assets/logo.svg"
 import style from "./register.module.scss"
 import Input from "../../components/Input";
 import { Link,useNavigate } from "react-router-dom";
+import config from '../../config.json'
 import axios from "axios";
 function Register(){
-    const HOST = "127.0.0.1"
+    
     const navigate = useNavigate()
     const [isAnimation,setIsAnimation] = useState(false)
     const [pressed, setPressed] = useState([false,false,false])
@@ -13,18 +14,20 @@ function Register(){
     const labels = [["Email address",'text'],["Username",'text'],["Password",'password']];
 
     function registerHandler(){
-        // const data = {
-        //     'email':fields[0],
-        //     'username':fields[1],
-        //     'password':fields[2]
-        // }
-        axios.get(`http://${HOST}:8000/register?email_address=${fields[0]}&username=${fields[1]}&password=${fields[2]}`).then(res=>res.data).then(res=>console.log(res)).catch(err=>console.log(err))
+        const url = `http://${config.HOST}:${config.PORT}/register`
+        const data = {
+            'email_address':fields[0],
+            'username':fields[1],
+            'password':fields[2]
+        }
+        
+        axios.post(url,data).then(res=>res.data).then(res=>console.log(res)).catch(err=>console.log(err))
     }
-    function toRegisterHandler(){
+    function toLoginHandler(){
         setIsAnimation(true)
         setTimeout(() => {
             navigate("/login")
-        }, 250);
+        }, 255);
     }
     function focusHandler(i){
         
@@ -32,13 +35,12 @@ function Register(){
             prev[i] = true
             return prev.slice(0)
         });
-        console.log(pressed)
     }
     function onClickOutsideHandler(i){
         if(fields[i].length==0 && pressed[i])setPressed(prev=>{prev[i]=false;return prev.slice(0);});
     }
     useEffect(()=>{
-        console.log(fields[0])
+        
     },[ fields,pressed])
     return(
         <div className={style.register}>
@@ -52,7 +54,7 @@ function Register(){
                 )
             }
             <div className={style.buttons}>
-                <button className={`${style.register_btn} ${isAnimation&&style.button_above}`} onClick={registerHandler}>
+                <button className={`${style.register_btn} ${isAnimation?style.button_above:""}`} onClick={registerHandler}>
                     Register
                 </button>
                 <div className={style.text}>
@@ -60,7 +62,7 @@ function Register(){
                 </div>
                 
                 
-                <button className={`${style.login_btn} ${isAnimation&&style.button_below}`} onClick={toRegisterHandler}>
+                <button className={`${style.login_btn} ${isAnimation?style.button_below:""}`} onClick={toLoginHandler}>
                         Login
                     </button>
                 

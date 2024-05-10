@@ -6,7 +6,7 @@
     // padding: 50px;
     .logo{
         margin-top: 39px;
-        margin-bottom: 150px;
+        margin-bottom: 100px;
         pointer-events: none;
         user-select: none;
     }
@@ -186,6 +186,7 @@
             transition: all .25s ease-in-out;
             top: 0px;
             font-size: 25px;
+            background-color: black;
 
 
         }
@@ -195,6 +196,7 @@
             height: 50px;
             top:$button-below;
             font-size: 20px;
+            background-color: rgba(0, 117, 125, 0.80);
 
         }
     }
