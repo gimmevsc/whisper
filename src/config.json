@@ -1,4 +1,5 @@
 {
     "HOST":"mywhisper.onrender.com",
-    "PORT":"8000"
+    "PORT":"8000",
+    "url":"http://localhost:8000"
 }

@@ -23,7 +23,7 @@ function Login() {
 
     function loginHandler(){
         // const url = `http://${config.HOST}:${config.PORT}`
-        const url = `https://${config.HOST}/login`
+        const url = `${config.url}/login`
 
         const data = {
             "username":fields[0],

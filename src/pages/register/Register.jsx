@@ -15,7 +15,7 @@ function Register(){
 
     function registerHandler(){
         // const url = `http://${config.HOST}:${config.PORT}/register`
-        const url = `https://${config.HOST}/register`
+        const url = `${config.url}/register`
 
         const data = {
             'email_address':fields[0],
@@ -23,7 +23,9 @@ function Register(){
             'password':fields[2]
         }
         
-        axios.post(url,data).then(res=>res.data).then(res=>console.log(res)).catch(err=>console.log(err))
+        axios.post(url,data).then(res=>res.data).then(res=>console.log(res)).catch(err=>console.log(err));
+
+        navigate("/register/confirmation")
     }
     function toLoginHandler(){
         setIsAnimation(true)
