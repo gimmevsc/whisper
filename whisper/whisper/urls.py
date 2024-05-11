@@ -24,7 +24,7 @@ urlpatterns = [
     path('admin', admin.site.urls),
     path('', include('register.urls')),
     path('', include('login.urls'))
-    
+   
 ]
 
 # handler404 = pageNotFound

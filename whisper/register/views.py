@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from re import match
+from .utils import send_verification_code
 import json 
 
 from .models import User
@@ -10,6 +11,8 @@ def is_valid_email(email):
     if match(regex, email):
         return True
     return False
+
+
 
 
 @csrf_exempt
@@ -54,7 +57,13 @@ def registerUser(request):
             user = User.objects.create(username=username, email_address=email_address, password=password)
             
             user.save()
-
+            
+            global email, code
+            
+            code = send_verification_code(email_address)
+            email = email_address
+            
+            
             return JsonResponse(
                 {   
                     'status': 'success'
@@ -74,3 +83,20 @@ def registerUser(request):
                     'message': 'Bad request',
                     'type': 'bad_request'
                 })
+
+@csrf_exempt
+def emailConfirmation(request):
+    data = json.loads(request.body.decode('utf-8'))
+    entered_code = data.get('code')
+    print(code, entered_code)
+    if code == entered_code:
+        return JsonResponse(
+            {'status': 'success'}
+        )
+    else:
+        return JsonResponse(
+            {
+                'status': 'error',            
+                'type': 'invalid code'
+            })
+
