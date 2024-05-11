@@ -14,7 +14,9 @@ function Register(){
     const labels = [["Email address",'text'],["Username",'text'],["Password",'password']];
 
     function registerHandler(){
-        const url = `http://${config.HOST}:${config.PORT}/register`
+        // const url = `http://${config.HOST}:${config.PORT}/register`
+        const url = `https://${config.HOST}/register`
+
         const data = {
             'email_address':fields[0],
             'username':fields[1],
