@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -72,6 +73,18 @@ SESSION_COOKIE_SECURE = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 SESSION_COOKIE_AGE = 7 * 24 * 60 * 60
+
+
+# CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+# CELERY_BEAT_SCHEDULE = {
+#     'cleanup_incomplete_registrations': {
+#         'task': 'register.tasks.cleanup_incomplete_registrations',
+#         'schedule': timedelta(seconds=6), 
+#     },
+# }
+
 
 TEMPLATES = [
     {

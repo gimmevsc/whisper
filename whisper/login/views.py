@@ -31,7 +31,7 @@ def loginUser(request):
             else:
                 return JsonResponse(
                     {
-                        'message': 'Invalid username or password'
+                        'message': 'Invalid username or password',
                     }, status=400)
         except json.JSONDecodeError:
             return JsonResponse(
