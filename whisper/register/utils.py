@@ -2,6 +2,9 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from random import randint
+from datetime import timedelta
+from re import match
+from django.utils import timezone
 
 def send_verification_code(email):
     sender_email = 'noreply.whispercode@gmail.com'
@@ -24,7 +27,18 @@ def send_verification_code(email):
         server.login(sender_email, sender_password)
         server.sendmail(sender_email, email, msg.as_string())
     
-    print(code)
-    
     return code
+
+
+def is_valid_email_funct(email):
+    regex = r'^.+@.+$'
+    if match(regex, email):
+        return True
+    return False
+
+
+def is_code_expired(created_at):
+    expiration_time = created_at + timedelta(minutes=5)
+    return timezone.now() > expiration_time
+
 

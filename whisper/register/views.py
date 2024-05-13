@@ -1,18 +1,11 @@
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
-from re import match
-from .utils import send_verification_code
+from django.utils import timezone
+from .utils import send_verification_code, is_valid_email_funct, is_code_expired
 import json 
 
 from .models import User
-
-def is_valid_email(email):
-    regex = r'^.+@.+$'
-    if match(regex, email):
-        return True
-    return False
-
 
 @csrf_exempt
 def registerUser(request):
@@ -42,7 +35,7 @@ def registerUser(request):
                         'type': 'exist_username'
                     }, status = 400)
              
-            if not is_valid_email(email_address):
+            if not is_valid_email_funct(email_address):
                 return JsonResponse(
                     { 
                         'message': 'Invalid email address',
@@ -51,7 +44,8 @@ def registerUser(request):
             
             code = send_verification_code(email_address)
             
-            user = User.objects.create(username=username, email_address=email_address, password=password, code=code, is_valid = False)
+            user = User.objects.create(username=username, email_address=email_address, password=password, 
+                                       code=code, is_valid_email = False, code_sent_at=timezone.now())
                         
             user.save()
             
@@ -86,19 +80,25 @@ def emailConfirmation(request):
         
         user = User.objects.get(email_address = email)        
         
-        if user.code == entered_code:    
+        if user.code == entered_code and not is_code_expired(user.code_sent_at):    
             
-            user.is_valid = True
+            user.is_valid_email = True
             
             return JsonResponse(
                 {
                     'status': 'success'
                 }, status = 200) 
-        else:
+        elif user.code != entered_code:
             return JsonResponse(
                 {          
                     'type': 'wrong code'
                 }, status = 400)
+        else:
+            return JsonResponse(
+                {          
+                    'type': 'code expired'
+                }, status = 400)
+            
     else:
         return JsonResponse(
                 {
@@ -108,7 +108,7 @@ def emailConfirmation(request):
 
 
 @csrf_exempt
-def resendCode(request):
+def resendConfirmationCode(request):
     
     if request.method == 'GET':
         
@@ -121,7 +121,7 @@ def resendCode(request):
             new_code = send_verification_code(email)
             
             user.code = new_code
-
+            user.code_sent_at = timezone.now()
             user.save()
             
             return JsonResponse(

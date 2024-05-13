@@ -5,5 +5,5 @@ from .views import *
 urlpatterns = [
     path('register', registerUser),
     path('register/confirmation', emailConfirmation),
-    path('register/confirmation/resend', resendCode)
+    path('register/confirmation/resend', resendConfirmationCode)
 ]
