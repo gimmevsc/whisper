@@ -22,74 +22,86 @@
         font-weight: 800;
         margin: 5px;
     }
-    .input_wrapper{
-        margin-top: 20px;
-        position: relative;
-        width: 355px;
-        height: 45px;
-        display: flex;
-        flex-direction: column;
-        .input{
-            font-size: 20px;
-
-            border-radius: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.40);
-            height: 100%;
-            width: 100%;
-            padding:0 18px ;
-            &:focus{
-                outline: none;
-                border: 1px solid rgba(0, 117, 125, 0.70);
-            }
-        }
-        input[type="password"]::-ms-reveal,
-        input[type="password"]::-ms-clear {
-            display: none;
-        }
-        .placeholder{
-            position: absolute;
-            pointer-events: none;
-            top: 50%;
-            left: 15px;
-            transform: translateY(-50%);
-            padding: 0 5px;
-            transition: all 0.2s ease-in-out;
-            color: rgba(0, 0, 0, 0.52);
-            background-color: white;
-            font-size: 20px;
-            font-weight: 300;
-        }
-        &:focus-within .placeholder{
-            color: rgba(0, 117, 125, 0.70);
-        }
-        .animation{
-            top:0;
-            font-size: 16px;
-        }
-        .password{
-            padding-right: 45px;
-        }
-        .password_btn{
-            transition-duration: 1s;
-            position: absolute;
-            border: none;
-            background-color: transparent;
-            top: 10px;
-            left: 310px;
-            img{
-                position: absolute;
-                opacity: 1;
-                transition: all 0.3s ease-in-out;
-            }
-            .hidden{
-                opacity: 0;
-            }
-        }
-
-        
-    }
+    .inputs{
+        .input_wrapper{
+            margin-top: 20px;
+            position: relative;
+            width: 355px;
+            height: 45px;
+            display: flex;
+            flex-direction: column;
+            .input{
+                font-size: 20px;
     
+                border-radius: 8px;
+                border: 1px solid rgba(0, 0, 0, 0.40);
+                height: 100%;
+                width: 100%;
+                padding:0 18px ;
+                &:focus{
+                    outline: none;
+                    border: 1px solid rgba(0, 117, 125, 0.70);
+                }
+            }
+            input[type="password"]::-ms-reveal,
+            input[type="password"]::-ms-clear {
+                display: none;
+            }
+            .placeholder{
+                position: absolute;
+                pointer-events: none;
+                top: 50%;
+                left: 15px;
+                transform: translateY(-50%);
+                padding: 0 5px;
+                transition: all 0.2s ease-in-out;
+                color: rgba(0, 0, 0, 0.52);
+                background-color: white;
+                font-size: 20px;
+                font-weight: 300;
+            }
+            &:focus-within .placeholder{
+                color: rgba(0, 117, 125, 0.70);
+            }
+            .animation{
+                top:0;
+                font-size: 16px;
+            }
+            .password{
+                padding-right: 45px;
+            }
+            .password_btn{
+                transition-duration: 1s;
+                position: absolute;
+                border: none;
+                background-color: transparent;
+                top: 10px;
+                left: 310px;
+                img{
+                    position: absolute;
+                    opacity: 1;
+                    transition: all 0.3s ease-in-out;
+                }
+                .hidden{
+                    opacity: 0;
+                }
+            }
+    
+            
+        }
+        .move_input{
+            transition-duration: .25s;
+            opacity: 0;
+        }
+    }
+    .inputs_animation{
+        transition-duration: .25s;
+        margin-top: -65px;
+    }
+
     .buttons {
+        position: absolute;
+        top: 600px;
         $button-below: 125px;
         margin-top: 20px;
         display: flex;
@@ -97,7 +109,7 @@
         align-items: center;
         transition-duration: 1s;
         height: 250px;
-        position: relative;
+        // position: relative;
         .register_btn {
             z-index: 101;
             top: 0;

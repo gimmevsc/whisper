@@ -52,10 +52,10 @@ function Register(){
 
             <h1 className={style.title}>Get Started Now!</h1>
             <div className={style.create_text}>Create your account here</div>
-            <div className={style.inputs}>
+            <div className={`${style.inputs} ${isAnimation?style.inputs_animation:""}`}>
             {
                 labels.map((n,i)=>
-                    <Input key={i} style={style} index={i} c={[fields,setFields]} field={fields} pressed={pressed} name={n[0]} inputType={n[1]} focusHandler={()=>focusHandler(i)} onClickOutside={()=>onClickOutsideHandler(i)}/>
+                    <Input key={i} style={style} index={i} isAnimation={isAnimation && i==0} c={[fields,setFields]} field={fields} pressed={pressed} name={n[0]} inputType={n[1]} focusHandler={()=>focusHandler(i)} onClickOutside={()=>onClickOutsideHandler(i)}/>
                 )
             }
             </div>

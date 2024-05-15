@@ -61,7 +61,7 @@ function Login() {
                     <input type="text" placeholder="Username" className={style.input} />
                 </div>
                 
-                <div className={style.forgot_password}>
+                <div className={`${style.forgot_password} ${isAnimation?style.forgot_password_animation:""}`}>
                     Forgot your password?
                 </div>
             </div>
