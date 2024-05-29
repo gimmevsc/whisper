@@ -38,7 +38,7 @@ def is_valid_email_funct(email):
 
 
 def is_code_expired(created_at):
-    expiration_time = created_at + timedelta(minutes=5)
+    expiration_time = created_at + timedelta(minutes=1)
     return timezone.now() > expiration_time
 
 
