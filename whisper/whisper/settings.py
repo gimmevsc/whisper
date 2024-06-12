@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    'django.contrib.sessions', #cookies
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'register.apps.RegisterConfig',
@@ -60,7 +60,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware', #cookies
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.common.CommonMiddleware'
 ]
@@ -71,9 +71,9 @@ ROOT_URLCONF = 'whisper.urls'
 
 SESSION_COOKIE_SECURE = True
 
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-SESSION_COOKIE_AGE = 7 * 24 * 60 * 60
+# SESSION_COOKIE_AGE = 3600
 
 
 # CELERY_BROKER_URL = 'redis://localhost:6379/0'

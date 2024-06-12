@@ -44,7 +44,6 @@ def registerUser(request):
                             'message': 'Email address already exists',
                             'type': 'exist_email'
                         }, status = 400)        
-            
                 
             if PreRegistration.objects.filter(Q(email_address=email_address) | Q(username=username)).exists():
                 
@@ -59,6 +58,7 @@ def registerUser(request):
                     }, status = 400)              
             
             code = send_verification_code(email_address)
+        
             
             user = PreRegistration.objects.create(username=username, email_address=email_address, password=password, 
                                        code=code, code_sent_at=timezone.now())
@@ -91,8 +91,8 @@ def emailConfirmation(request):
         
         data = json.loads(request.body.decode('utf-8'))
     
-        email = 'bodya180505@gmail.com'
-        # email = data.get('email_address')
+        # email = 'bodya180505@gmail.com'
+        email = data.get('email_address')
         entered_code = data.get('code')
         
         pre_user = PreRegistration.objects.get(email_address = email)
@@ -135,9 +135,9 @@ def resendConfirmationCode(request):
         
         try:
             
-            # email = request.GET.get('email_address')
+            email = request.GET.get('email_address')
 
-            email = 'bodya170505@gmail.com'    
+            # email = 'bodya170505@gmail.com'    
             pre_user = PreRegistration.objects.get(email_address=email)
             
             new_code = send_verification_code(email)
