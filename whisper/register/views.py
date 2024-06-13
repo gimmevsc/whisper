@@ -5,8 +5,7 @@ from django.utils import timezone
 from .utils import send_verification_code, is_valid_email_funct, is_code_expired
 import json 
 
-from .models import User
-from .models import PreRegistration
+from .models import User, PreRegistration
 from django.db.models import Q
 
 @csrf_exempt
@@ -16,9 +15,9 @@ def registerUser(request):
     
         data = json.loads(request.body.decode('utf-8'))
         
-        email_address = data.get('email_address')
-        username = data.get('username')
-        password = data.get('password')
+        email_address = str(data.get('email_address'))
+        username = str(data.get('username'))
+        password = str(data.get('password'))
         
         if username and email_address and password:
             
@@ -91,8 +90,7 @@ def emailConfirmation(request):
         
         data = json.loads(request.body.decode('utf-8'))
     
-        # email = 'bodya180505@gmail.com'
-        email = data.get('email_address')
+        email = str(data.get('email_address'))
         entered_code = str(data.get('code'))
         
         pre_user = PreRegistration.objects.get(email_address = email)
@@ -134,14 +132,13 @@ def resendConfirmationCode(request):
     if request.method == 'GET':
         
         try:
-            email = request.GET.get('email_address')
+            email = str(request.GET.get('email_address'))
 
-            # email = 'bodya170505@gmail.com'    
             pre_user = PreRegistration.objects.get(email_address=email)
             
             new_code = send_verification_code(email)
             
-            pre_user.code = new_code
+            pre_user.code = str(new_code)
             pre_user.code_sent_at = timezone.now()
             pre_user.save()
             

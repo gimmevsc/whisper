@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'register.apps.RegisterConfig',
     'login.apps.LoginConfig',
+    'reset_password.apps.ResetPasswordConfig',
     'corsheaders'
 ]
 
