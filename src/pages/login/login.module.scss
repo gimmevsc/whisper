@@ -120,6 +120,19 @@
             font-size: 15px;
             font-weight: 800;
             line-height: 21px;
+            > a{
+                text-decoration: none;
+                &:hover{
+                    color: #00757D;
+                }
+                &:active{
+                    color: #00757D;
+                }
+                &:visited{
+                    color: #00757D;
+
+                }
+            }
         }
         .forgot_password_animation{
             transition-duration: .25s;

@@ -62,7 +62,8 @@ function Login() {
                 </div>
                 
                 <div className={`${style.forgot_password} ${isAnimation?style.forgot_password_animation:""}`}>
-                    Forgot your password?
+                    <a href="/reset">Forgot your password?</a>
+                    
                 </div>
             </div>
             <div className={`${style.buttons} ${isAnimation?style.buttons_animation:""}`}>
