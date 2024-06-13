@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 import json
 from django.utils import timezone
 from register.models import User, PreRegistration
-from .models import PasswordReset
+from reset_password.models import PasswordReset
 from django.http import JsonResponse
 from register.utils import send_verification_code, is_code_expired
 
@@ -45,11 +45,15 @@ def enterEmail(request):
 
         if User.objects.filter(email_address=email_address).exists():
             
+            if PasswordReset.objects.filter(user__email_address=email_address).exists():
+                
+                PasswordReset.objects.filter(user__email_address=email_address).delete()
+                         
             code = send_verification_code(email_address)
             
             user = User.objects.get(email_address=email_address)
             
-            reset_user = PasswordReset.objects.create(user_id = user, code=code, code_sent_at=timezone.now())
+            reset_user = PasswordReset.objects.create(user = user, code=code, code_sent_at=timezone.now())
                         
             reset_user.save()
             
@@ -87,9 +91,9 @@ def resetPassword(request):
         
         reset_user = PasswordReset.objects.get(user__email_address = email_address)
         
-        if reset_user.code == entered_code and not is_code_expired(reset_user.code_sent_at):    
-            
-            user = reset_user.user 
+        user = reset_user.user
+        
+        if reset_user.code == entered_code and not is_code_expired(reset_user.code_sent_at) and user.password != new_password:
             
             user.password = str(new_password)
             
@@ -101,6 +105,12 @@ def resetPassword(request):
                 {
                     'status': 'success'
                 }, status = 200) 
+        
+        elif user.password == new_password:
+            return JsonResponse(
+                {          
+                    'type': 'the same passsword'
+                }, status = 400)
             
         elif reset_user.code != entered_code:
             return JsonResponse(
