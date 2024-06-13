@@ -19,7 +19,7 @@ class PreRegistration(models.Model):
     username = models.CharField(max_length=100)
     email_address = models.EmailField()
     password = models.CharField(max_length=128)
-    code = models.IntegerField(max_length=8)
+    code = models.CharField(max_length=8)
     code_sent_at = models.DateTimeField()
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)

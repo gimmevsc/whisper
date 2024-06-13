@@ -93,7 +93,7 @@ def emailConfirmation(request):
     
         # email = 'bodya180505@gmail.com'
         email = data.get('email_address')
-        entered_code = data.get('code')
+        entered_code = str(data.get('code'))
         
         pre_user = PreRegistration.objects.get(email_address = email)
         
@@ -134,7 +134,6 @@ def resendConfirmationCode(request):
     if request.method == 'GET':
         
         try:
-            
             email = request.GET.get('email_address')
 
             # email = 'bodya170505@gmail.com'    
