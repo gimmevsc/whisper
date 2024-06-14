@@ -56,7 +56,7 @@ def registerUser(request):
                         'type': 'invalid_email'
                     }, status = 400)              
             
-            code = send_verification_code(email_address)
+            code = send_verification_code(email_address, 'Verify your email address', 'Your verification code is')
         
             
             user = PreRegistration.objects.create(username=username, email_address=email_address, password=password, 
@@ -136,7 +136,7 @@ def resendConfirmationCode(request):
 
             pre_user = PreRegistration.objects.get(email_address=email)
             
-            new_code = send_verification_code(email)
+            new_code = send_verification_code(email, 'Verify your email address', 'Your verification code is')
             
             pre_user.code = str(new_code)
             pre_user.code_sent_at = timezone.now()

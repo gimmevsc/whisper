@@ -1,38 +1,51 @@
 from django.http import JsonResponse
 from register.models import User
 from django.views.decorators.csrf import csrf_exempt
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 import json
-
 
 @csrf_exempt
 def loginUser(request):
-    
     if request.method == 'POST':
         try:
             data = json.loads(request.body.decode('utf-8'))
             username_or_email = data.get('username')
             password = data.get('password')
 
-            if '@' in username_or_email:
-                try:
-                    user = User.objects.get(email_address=username_or_email)
-                    username = user.username
-                except User.DoesNotExist:
-                    user = None
-            else:
+            try:
+                # Try to validate the email
+                validate_email(username_or_email)
+                # If the email is valid, fetch the user by email
+                user = User.objects.get(email_address=username_or_email)
+                username = user.username
+            except ValidationError:
+                # If validation error occurs, treat it as a username
                 username = username_or_email
-                                
-            if User.objects.filter(username=username, password=password).exists():
+                user = User.objects.filter(username=username).first()
+                if not user:
+                    return JsonResponse(
+                        {
+                            'message': 'Username does not exist'
+                        }, status=400)
+            except User.DoesNotExist:
+                return JsonResponse(
+                    {
+                        'message': 'Email address does not exist'
+                    }, status=400)
+
+            # Check if the password is correct
+            if user.password == password:
                 return JsonResponse(
                     {
                         'message': 'Login successful'
                     }, status=200)
-                
             else:
                 return JsonResponse(
                     {
-                        'message': 'Invalid username or password',
+                        'message': 'Invalid password'
                     }, status=400)
+
         except json.JSONDecodeError:
             return JsonResponse(
                 {
@@ -48,4 +61,3 @@ def loginUser(request):
             {
                 'message': 'Only POST requests are allowed'
             }, status=405)
-

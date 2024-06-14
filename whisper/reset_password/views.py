@@ -49,7 +49,7 @@ def enterEmail(request):
                 
                 PasswordReset.objects.filter(user__email_address=email_address).delete()
                          
-            code = send_verification_code(email_address)
+            code = send_verification_code(email_address, 'Password reset', "Here's your password reset code")
             
             user = User.objects.get(email_address=email_address)
             

@@ -7,7 +7,7 @@ from re import match
 from django.utils import timezone
 
 
-def send_verification_code(email):
+def send_verification_code(email, email_goal, email_main):
     sender_email = 'noreply.whispercode@gmail.com'
     sender_password = 'jhbi pzln sxbo nozu'
     smtp_server = 'smtp.gmail.com'
@@ -20,7 +20,8 @@ def send_verification_code(email):
         html_template = file.read()
 
     # Replace the placeholder with the actual code
-    html_message = html_template.replace('{{ code }}', code)
+    html_message = html_template.replace('{{ code }}', code).replace('{{ email_goal }}', email_goal).replace('{{ email_main }}', email_main)
+    
 
     # Email subject and message
     subject = 'Verification Code'
@@ -55,5 +56,5 @@ def is_valid_email_funct(email):
 
 
 def is_code_expired(created_at):
-    expiration_time = created_at + timedelta(minutes=1) 
+    expiration_time = created_at + timedelta(minutes=5) 
     return timezone.now() > expiration_time
