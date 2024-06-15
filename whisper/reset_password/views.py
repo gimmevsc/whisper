@@ -19,6 +19,7 @@ def enterEmail(request):
             return JsonResponse(
                 {
                     'message': 'Invalid JSON',
+                    'status': 'error',
                     'type': 'invalid_json'
                 }, status=400
             )
@@ -29,6 +30,7 @@ def enterEmail(request):
             return JsonResponse(
                 {
                     'message': 'Email field is empty',
+                    'status': 'error',
                     'type': 'empty_email'
                 }, status=400
             )
@@ -39,6 +41,7 @@ def enterEmail(request):
             return JsonResponse(
                 {
                     'message': 'Invalid email format',
+                    'status': 'error',
                     'type': 'invalid_email'
                 }, status=400
             )
@@ -66,6 +69,7 @@ def enterEmail(request):
             return JsonResponse(
                 {
                     'message': "Email doesn't exist",
+                    'status': 'error',
                     'type': 'wrong_email'
                 }, status=400
             )
@@ -73,6 +77,7 @@ def enterEmail(request):
         return JsonResponse(
             {
                 'message': 'Invalid request method',
+                'status': 'error',
                 'type': 'invalid_method'
             }, status=405
         )
@@ -109,23 +114,27 @@ def resetPassword(request):
         elif user.password == new_password:
             return JsonResponse(
                 {          
-                    'type': 'the same passsword'
+                    'type': 'same_passsword'
+                    
                 }, status = 400)
             
         elif reset_user.code != entered_code:
             return JsonResponse(
                 {          
-                    'type': 'wrong code'
+                    'type': 'wrong code',
+                    'status': 'error'
                 }, status = 400)
         else:
             return JsonResponse(
                 {          
-                    'type': 'code expired'
+                    'type': 'code expired',
+                    'status': 'error'
                 }, status = 400)
             
     else:
         return JsonResponse(
                 {
                     'message': 'Bad request',
+                    'status': 'error',
                     'type': 'bad_request'
                 }, status = 405)

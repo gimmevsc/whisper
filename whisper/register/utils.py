@@ -55,6 +55,20 @@ def is_valid_email_funct(email):
     return False
 
 
+
 def is_code_expired(created_at):
     expiration_time = created_at + timedelta(minutes=5) 
     return timezone.now() > expiration_time
+
+
+
+def user_profile_picture_path(instance, filename):
+
+    # user_id = instance.user_id
+    
+    username = instance.username
+    
+    ext = filename.split('.')[-1]
+
+    # Construct the upload path: profile_pictures/user_id/filename.ext
+    return f'profile_pictures/{username}/{username}.{ext}'
