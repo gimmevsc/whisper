@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import json
+from django.contrib.auth import authenticate
 from django.conf import settings
 import jwt
 
@@ -25,12 +26,14 @@ def loginUser(request):
             except ValidationError:
                 # If validation error occurs, treat it as a username
                 username = username_or_email
-                user = User.objects.filter(username=username).first()
+                user = authenticate(username = username, password=password)
+                
                 if not user:
                     return JsonResponse(
                         {
                             'message': 'Username does not exist'
                         }, status=400)
+                    
             except User.DoesNotExist:
                 return JsonResponse(
                     {
@@ -38,13 +41,15 @@ def loginUser(request):
                     }, status=400)
 
             # Check if the password is correct
-            if user.password == password:
-                # print(user.user_id, user.username)
-                
+            user = authenticate(username=username, password=password)
+            
+            if user is not None:
                 payload = {
                     'user_id': user.user_id,
-                    'username': user.username
-                    # 'exp': datetime.utcnow() + timedelta(days=1)  # Token expiration time (1 day from now)
+                    'username': user.username,
+                    'email_address' : user.email_address,
+                    'first_name' : user.first_name,
+                    'last_name' : user.last_name            
                 }
                 token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
 

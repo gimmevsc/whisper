@@ -1,8 +1,24 @@
 from django.db import models
 from django.utils import timezone
 from .utils import user_profile_picture_path
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
-class User(models.Model):
+class UserManager(BaseUserManager):
+    def create_user(self, username, email_address, password=None, **extra_fields):
+        if not email_address:
+            raise ValueError('The Email Address field must be set')
+        email_address = self.normalize_email(email_address)
+        user = self.model(username=username, email_address=email_address, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username, email_address, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(username, email_address, password, **extra_fields)
+
+class User(AbstractBaseUser):
     user_id = models.AutoField(primary_key=True)
     username = models.CharField(max_length=100, unique=True)
     email_address = models.EmailField(unique=True)
@@ -14,6 +30,15 @@ class User(models.Model):
     profile_picture = models.ImageField(upload_to=user_profile_picture_path, blank=True, null=True)
     created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Required fields for Django authentication
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
+    EMAIL_FIELD = 'email_address'
 
     def __str__(self):
         return self.username

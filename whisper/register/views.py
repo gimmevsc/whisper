@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from .utils import send_verification_code, is_valid_email_funct, is_code_expired
 import json 
+from django.contrib.auth.hashers import make_password
 
 from .models import User, PreRegistration
 from django.db.models import Q
@@ -57,9 +58,9 @@ def registerUser(request):
                     }, status = 400)              
             
             code = send_verification_code(email_address, 'Verify your email address', 'Your verification code is')
-        
+                   
             
-            user = PreRegistration.objects.create(username=username, email_address=email_address, password=password, 
+            user = PreRegistration.objects.create(username=username, email_address=email_address, password=make_password(password), 
                                        code=code, code_sent_at=timezone.now())
                         
             user.save()

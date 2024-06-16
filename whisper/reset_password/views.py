@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import json
+from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
 from register.models import User, PreRegistration
 from reset_password.models import PasswordReset
@@ -98,9 +99,9 @@ def resetPassword(request):
         
         user = reset_user.user
         
-        if reset_user.code == entered_code and not is_code_expired(reset_user.code_sent_at) and user.password != new_password:
+        if reset_user.code == entered_code and not is_code_expired(reset_user.code_sent_at) and not check_password(new_password, user.password):
             
-            user.password = str(new_password)
+            user.password = make_password(new_password)
             
             user.save()
             
@@ -111,7 +112,7 @@ def resetPassword(request):
                     'status': 'success'
                 }, status = 200) 
         
-        elif user.password == new_password:
+        elif check_password(new_password, user.password):
             return JsonResponse(
                 {          
                     'type': 'same_passsword'
