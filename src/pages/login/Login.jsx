@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Cookies from 'js-cookie';
 import logo from "../../assets/logo.svg"
 import style from "./login.module.scss"
 import Input from "../../components/Input";
@@ -29,7 +30,11 @@ function Login() {
             "username":fields[0],
             "password":fields[1]
         }
-        axios.post(url,data).then(res=>console.log(res.data)).catch(err=>console.log(err))
+        axios.post(url,data).then(res=>{
+            Cookies.set('token', res.data.token, { expires: 30 }); // Expires in 30 days
+            Cookies.set("email",fields[0]);
+            navigate("/chat")
+        }).catch(err=>alert(err))
     }
 
     function toRegisterHandler(){

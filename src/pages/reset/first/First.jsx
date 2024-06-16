@@ -33,8 +33,10 @@ function First(props){
                 'email_address':fields[0],
             }
             localStorage.setItem("email",data['email_address'])
+            let s = Date.now()
             axios.post(url,data).then(res=>{
                 props.setFirst(prev=>!prev);
+                console.log(Date.now() - s )
             }).catch(err=>{
                 alert("non valid email")
                 console.log(err.response.data.type)
