@@ -4,10 +4,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import json
+from django.conf import settings
+import jwt
 
 @csrf_exempt
 def loginUser(request):
     if request.method == 'POST':
+        
         try:
             data = json.loads(request.body.decode('utf-8'))
             username_or_email = data.get('username')
@@ -36,9 +39,19 @@ def loginUser(request):
 
             # Check if the password is correct
             if user.password == password:
+                # print(user.user_id, user.username)
+                
+                payload = {
+                    'user_id': user.user_id,
+                    'username': user.username
+                    # 'exp': datetime.utcnow() + timedelta(days=1)  # Token expiration time (1 day from now)
+                }
+                token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+
                 return JsonResponse(
                     {
-                        'message': 'Login successful'
+                        'message': 'Login successful',
+                        'token': token
                     }, status=200)
             else:
                 return JsonResponse(

@@ -4,8 +4,10 @@ from email.mime.multipart import MIMEMultipart
 from random import randint
 from datetime import timedelta
 from re import match
+from django.db.models.signals import pre_delete
 from django.utils import timezone
-
+from django.dispatch import receiver
+from django.contrib.auth.models import User 
 
 def send_verification_code(email, email_goal, email_main):
     sender_email = 'noreply.whispercode@gmail.com'
@@ -72,3 +74,12 @@ def user_profile_picture_path(instance, filename):
 
     # Construct the upload path: profile_pictures/user_id/filename.ext
     return f'profile_pictures/{username}/{username}.{ext}'
+
+
+@receiver(pre_delete, sender=User)
+def delete_profile_picture(sender, instance, **kwargs):
+    # Check if profile_picture field exists on the User model
+    if hasattr(instance, 'profile_picture'):
+        # Delete the profile picture file from storage
+        if instance.profile_picture:
+            instance.profile_picture.delete(save=False)
