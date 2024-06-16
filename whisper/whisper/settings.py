@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # 'Pillow',
     'register.apps.RegisterConfig',
     'login.apps.LoginConfig',
+    'chat.apps.ChatConfig',
     'reset_password.apps.ResetPasswordConfig',
     'corsheaders'
 ]
@@ -54,15 +55,12 @@ CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware', #cookies
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.common.CommonMiddleware'
 ]
@@ -73,20 +71,6 @@ ROOT_URLCONF = 'whisper.urls'
 
 SESSION_COOKIE_SECURE = True
 
-# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-# SESSION_COOKIE_AGE = 3600
-
-
-# CELERY_BROKER_URL = 'redis://localhost:6379/0'
-# CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
-
-# CELERY_BEAT_SCHEDULE = {
-#     'cleanup_incomplete_registrations': {
-#         'task': 'register.tasks.cleanup_incomplete_registrations',
-#         'schedule': timedelta(seconds=6), 
-#     },
-# }
 
 
 TEMPLATES = [
@@ -105,8 +89,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'whisper.wsgi.application'
-
+# WSGI_APPLICATION = 'whisper.wsgi.application'
+ASGI_APPLICATION = 'whisper.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
