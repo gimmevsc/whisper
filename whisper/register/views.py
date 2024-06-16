@@ -2,8 +2,9 @@ from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from .utils import send_verification_code, is_valid_email_funct, is_code_expired
+from .utils import send_verification_code, is_valid_email_funct, is_code_expired, generate_code
 import json 
+import threading
 from django.contrib.auth.hashers import make_password
 
 from .models import User, PreRegistration
@@ -57,8 +58,10 @@ def registerUser(request):
                         'type': 'invalid_email'
                     }, status = 400)              
             
-            code = send_verification_code(email_address, 'Verify your email address', 'Your verification code is')
-                   
+            code = generate_code()
+                 
+            code_sender = threading.Thread(target=send_verification_code, args=(email_address, code, 'Verify your email address', 'Your verification code is'))
+            code_sender.start()   
             
             user = PreRegistration.objects.create(username=username, email_address=email_address, password=make_password(password), 
                                        code=code, code_sent_at=timezone.now())
@@ -133,11 +136,14 @@ def resendConfirmationCode(request):
     if request.method == 'GET':
         
         try:
-            email = str(request.GET.get('email_address'))
+            email_address = str(request.GET.get('email_address'))
 
-            pre_user = PreRegistration.objects.get(email_address=email)
+            pre_user = PreRegistration.objects.get(email_address=email_address)
             
-            new_code = send_verification_code(email, 'Verify your email address', 'Your verification code is')
+            new_code = generate_code()
+                 
+            code_sender = threading.Thread(target=send_verification_code, args=(email_address, new_code, 'Verify your email address', 'Your verification code is'))
+            code_sender.start()
             
             pre_user.code = str(new_code)
             pre_user.code_sent_at = timezone.now()

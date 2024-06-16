@@ -5,10 +5,11 @@ from django.core.exceptions import ValidationError
 import json
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
-from register.models import User, PreRegistration
+from register.models import User
 from reset_password.models import PasswordReset
 from django.http import JsonResponse
-from register.utils import send_verification_code, is_code_expired
+from register.utils import send_verification_code, is_code_expired, generate_code
+import threading
 
 @csrf_exempt
 def enterEmail(request):
@@ -52,8 +53,11 @@ def enterEmail(request):
             if PasswordReset.objects.filter(user__email_address=email_address).exists():
                 
                 PasswordReset.objects.filter(user__email_address=email_address).delete()
-                         
-            code = send_verification_code(email_address, 'Password reset', "Here's your password reset code")
+                   
+            code = generate_code()
+                 
+            code_sender = threading.Thread(target=send_verification_code, args=(email_address, code, 'Password reset', "Here's your password reset code"))
+            code_sender.start()
             
             user = User.objects.get(email_address=email_address)
             

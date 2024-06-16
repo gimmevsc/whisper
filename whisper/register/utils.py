@@ -9,14 +9,17 @@ from django.utils import timezone
 from django.dispatch import receiver
 from django.contrib.auth.models import User 
 
-def send_verification_code(email, email_goal, email_main):
+
+
+def generate_code():
+    return str(str(randint(0,9))+str(randint(0,9))+str(randint(0,9))+str(randint(0,9))+str(randint(0,9))+str(randint(0,9)))
+
+
+def send_verification_code(email, code, email_goal, email_main):
     sender_email = 'noreply.whispercode@gmail.com'
     sender_password = 'jhbi pzln sxbo nozu'
     smtp_server = 'smtp.gmail.com'
     smtp_port = 587
-    
-    code = str(str(randint(0,9))+str(randint(0,9))+str(randint(0,9))+str(randint(0,9))+str(randint(0,9))+str(randint(0,9)))
-    
     
     with open('register/email.html', 'r') as file:
         html_template = file.read()
@@ -61,7 +64,6 @@ def is_valid_email_funct(email):
 def is_code_expired(created_at):
     expiration_time = created_at + timedelta(minutes=5) 
     return timezone.now() > expiration_time
-
 
 
 def user_profile_picture_path(instance, filename):
