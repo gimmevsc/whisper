@@ -15,7 +15,6 @@ def loginUser(request):
             data = json.loads(request.body.decode('utf-8'))
             username_or_email = data.get('username')
             password = data.get('password')
-
             try:
                 # Try to validate the email
                 validate_email(username_or_email)
@@ -24,8 +23,8 @@ def loginUser(request):
                 username = user.username
             except ValidationError:
                 # If validation error occurs, treat it as a username
-                
-                
+                username = username_or_email
+                user = User.objects.filter(username=username).first()
                 if not user:
                     return JsonResponse(
                         {
@@ -37,7 +36,7 @@ def loginUser(request):
                     {
                         'message': 'Email address does not exist'
                     }, status=400)
-
+            
             # Check if the password is correct
             user = authenticate(request, username=username, password=password)
             
