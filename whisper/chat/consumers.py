@@ -1,23 +1,73 @@
-from channels.generic.websocket import WebsocketConsumer
-from django.shortcuts import get_object_or_404
-from django.template.loader import render_to_string
-from asgiref.sync import async_to_sync
 import json
-from register.models import *
+from channels.generic.websocket import AsyncWebsocketConsumer
+from django.conf import settings
+from django.contrib.auth import get_user_model
+import jwt
+from chat.tokenauthentication import JWTAuthentication
+from asgiref.sync import sync_to_async  # Import sync_to_async
 
-class ChatroomConsumer(WebsocketConsumer):
-    def connect(self):
-        self.user = self.scope['user']
-        self.chatroom_name = self.scope['url_route']['kwargs']['chat'] 
-        self.chatroom = get_object_or_404(ChatGroup, group_name=self.chatroom_name)
+User = get_user_model()
+
+class PersonalChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        # Extract the JWT token from cookies
+        token = self.scope['cookies'].get('token')
+        if not token:
+            await self.close(code=4001)
+            return
         
-        async_to_sync(self.channel_layer.group_add)(
-            self.chatroom_name, self.channel_name
+        # Decode the JWT token to get the user information
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+            user_id = payload['user_id']
+            self.scope['user'] = await sync_to_async(User.objects.get)(user_id=user_id)
+        except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, User.DoesNotExist) as e:
+            await self.close(code=4001)
+            return
+        
+        # Get the other user ID from the URL route
+        other_user_id = self.scope['url_route']['kwargs']['username']
+        # user = self.scope['user']
+        # Determine the room name based on user IDs
+        my_id = self.scope['user'].user_id
+        # other_user_id =
+        
+        if int(my_id) > int(other_user_id):
+            self.room_name = f'{my_id}-{other_user_id}'
+        else:
+            self.room_name = f'{other_user_id}-{my_id}'
+        
+        self.room_group_name = f'chat_{self.room_name}'
+        # Add the channel to the group
+        # print(self.room_group_name, user)
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
         )
         
-        # add and update online users
-        # if self.user not in self.chatroom.users_online.all():
-        #     self.chatroom.users_online.add(self.user)
-        #     self.update_online_count()
-        
-        self.accept()
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        message = data['message']
+
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message
+            }
+        )
+
+    async def chat_message(self, event):
+        message = event['message']
+
+        await self.send(text_data=json.dumps({
+            'message': message
+        }))

@@ -4,9 +4,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 import json
-from django.contrib.auth import authenticate
-from django.conf import settings
-import jwt
+from django.contrib.auth import authenticate, login
+from chat.tokenauthentication import JWTAuthentication
 
 @csrf_exempt
 def loginUser(request):
@@ -25,8 +24,7 @@ def loginUser(request):
                 username = user.username
             except ValidationError:
                 # If validation error occurs, treat it as a username
-                username = username_or_email
-                user = authenticate(username = username, password=password)
+                
                 
                 if not user:
                     return JsonResponse(
@@ -41,17 +39,21 @@ def loginUser(request):
                     }, status=400)
 
             # Check if the password is correct
-            user = authenticate(username=username, password=password)
+            user = authenticate(request, username=username, password=password)
             
             if user is not None:
-                payload = {
+                
+                login(request, user)
+                
+                playload = {
                     'user_id': user.user_id,
                     'username': user.username,
                     'email_address' : user.email_address,
                     'first_name' : user.first_name,
                     'last_name' : user.last_name            
                 }
-                token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+                
+                token = JWTAuthentication.generate_token(playload)
 
                 return JsonResponse(
                     {

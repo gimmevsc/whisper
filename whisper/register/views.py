@@ -12,9 +12,9 @@ from django.db.models import Q
 
 @csrf_exempt
 def registerUser(request):
-    
+
     if request.method == 'POST':
-    
+        
         data = json.loads(request.body.decode('utf-8'))
         
         email_address = str(data.get('email_address'))
