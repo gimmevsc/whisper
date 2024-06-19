@@ -7,10 +7,10 @@ from django.http import JsonResponse
 
 
 
-def chatPage(request):
-    return JsonResponse({
-        'message': 'you are here'
-    }, status=400)
+def chatPage(request, room_name):
+    messages = ChatModel.objects.filter(thread_name=room_name).order_by('timestamp')
+    messages_list = list(messages.values('sender', 'message', 'timestamp'))
+    return JsonResponse(messages_list, safe=False)
 #     user_obj = User.objects.get(username=username)
 #     users = User.objects.exclude(username=request.user.username)
 
