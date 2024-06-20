@@ -1,16 +1,47 @@
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from chat.models import ChatModel
-from register.models import *
+from register.models import User  # Assuming User is in register.models
+from django.core.exceptions import PermissionDenied
+from django.views.decorators.csrf import csrf_exempt
 import json
 from django.http import JsonResponse
 
-
-
+@csrf_exempt
 def chatPage(request, room_name):
-    messages = ChatModel.objects.filter(thread_name=room_name).order_by('timestamp')
-    messages_list = list(messages.values('sender', 'message', 'timestamp'))
-    return JsonResponse(messages_list, safe=False)
+    
+    if request.method == 'POST':
+        user = request.user
+        print(user)
+        data = json.loads(request.body.decode('utf-8'))
+        l = data.get('lol')
+        print(data)
+        return JsonResponse(
+            {
+                'message': 'Username does not exist',
+                'room' : room_name
+            }, status=200)
+    # print('sdfsdfsdfsdf')
+    # user = request.user
+    # # Assuming room_name is the user_id of the other participant
+    # try:
+    #     other_user = User.objects.get(id=room_name)
+    # except User.DoesNotExist:
+    #     return JsonResponse({'error': 'User does not exist'}, status=404)
+
+    # # Fetch messages for the chat between the authenticated user and the other user
+    # thread_name = f"{user.id}_{room_name}"  # This can be your logic for the thread name
+    # messages = ChatModel.objects.filter(thread_name=thread_name).order_by('timestamp')
+    # messages_list = list(messages.values('sender', 'message', 'timestamp'))
+
+    # return JsonResponse(messages_list, safe=False)
+
+
+
+
+
+
+
 #     user_obj = User.objects.get(username=username)
 #     users = User.objects.exclude(username=request.user.username)
 

@@ -54,9 +54,10 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
-        message = data['message']
-        
+        print(text_data)
+        # data = json.loads(text_data)
+        # message = data['message']
+        message = text_data
         # Save the message to the database
         await self.save_message(message)
         

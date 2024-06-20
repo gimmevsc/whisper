@@ -25,6 +25,7 @@ def loginUser(request):
                 # If validation error occurs, treat it as a username
                 username = username_or_email
                 user = User.objects.filter(username=username).first()
+                
                 if not user:
                     return JsonResponse(
                         {
@@ -37,6 +38,7 @@ def loginUser(request):
                         'message': 'Email address does not exist'
                     }, status=400)
             
+            print(username, password)
             # Check if the password is correct
             user = authenticate(request, username=username, password=password)
             
@@ -51,9 +53,9 @@ def loginUser(request):
                     'first_name' : user.first_name,
                     'last_name' : user.last_name            
                 }
-                
+                print('sdfsfsdfsdfsdf')
                 token = JWTAuthentication.generate_token(playload)
-
+                print(token)
                 return JsonResponse(
                     {
                         'message': 'Login successful',

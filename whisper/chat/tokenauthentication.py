@@ -1,5 +1,4 @@
 import jwt
-from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from django.conf import settings
@@ -14,16 +13,16 @@ class JWTAuthentication(BaseAuthentication):
         # token = self.extract_token(request=request)
         # if token in None:
         #     return None 
-        try:
-            playload = jwt.decode(token, settings.SECRET_KEY, 'HS256')
-            # self.verify_token(playload=playload)
-            
-            user_id = playload['user_id']
-            user = User.objects.get(user_id=user_id)
-            return user
+        # try:s
+        playload = jwt.decode(token, settings.SECRET_KEY, 'HS256')
+        # self.verify_token(playload=playload)
         
-        except(InvalidTokenError, ExpiredSignatureError, User.DoesNotExist):
-            raise AuthenticationFailed("Invalid token")
+        user_id = playload['user_id']
+        user = User.objects.get(user_id=user_id)
+        return user
+        
+        # except(InvalidTokenError, ExpiredSignatureError, User.DoesNotExist):
+        #     raise AuthenticationFailed("Invalid token")
         
     # def verify_token(self, playload):
     #     if "exp" not in playload:
