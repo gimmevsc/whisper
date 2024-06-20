@@ -3,6 +3,8 @@ import Register from './pages/register/Register';
 import Login from './pages/login/Login';
 import Reset from './pages/reset/Reset';
 import Chat from './pages/chat/Chat';
+import ChatRoom from './pages/chatroom/ChatRoom';
+
 import Confirmation from './pages/register/confirmation/Confirmation';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 function App() {
@@ -15,7 +17,8 @@ function App() {
         <Route path="/register" element={<Register />}/>
         <Route path="/register/confirmation" element={<Confirmation />}/>
         <Route path="/reset" element={<Reset />}/>
-        <Route path="/chat/:room" element={<Chat />}/>
+        <Route path="/chatroom/:room" element={<ChatRoom />}/>
+        <Route path="/chat" element={<Chat />}/>
 
 
           {/* <Route index element={<Home />} />
