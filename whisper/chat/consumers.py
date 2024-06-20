@@ -60,7 +60,6 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         message = text_data
         # Save the message to the database
         await self.save_message(message)
-        
         # Send the message to the group
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -82,15 +81,16 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
 
     
     async def chat_message(self, event):
+        print(event)
         message = event['message']
         username = event['username']
-        
+        print(message, username)
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
             'username': username
         }))
-    
+        
     
 # class GroupChatConsumer(AsyncWebsocketConsumer):
 #     async def connect(self):

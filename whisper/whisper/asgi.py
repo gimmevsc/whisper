@@ -11,6 +11,7 @@ from channels.auth import AuthMiddlewareStack
 from django.core.asgi import get_asgi_application
 # from chat.routing import websocket_urlpatterns
 import os
+from channels.layers import get_channel_layer
 from chat.consumers import PersonalChatConsumer
 from django.urls import re_path
 
@@ -32,3 +33,4 @@ application = ProtocolTypeRouter({
         ),
     }
 )
+channel_layer = get_channel_layer()

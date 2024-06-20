@@ -50,7 +50,8 @@ INSTALLED_APPS = [
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'http://192.168.31.234:3000'
+    'http://192.168.31.234:3000',
+    'ws://localhost:8000'
 ]
 
 CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
