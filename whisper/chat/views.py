@@ -5,67 +5,102 @@ from register.models import User  # Assuming User is in register.models
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
 import json
+import jwt
+from django.conf import settings
 from django.http import JsonResponse
+
 
 @csrf_exempt
 def chatPage(request, room_name):
     
     if request.method == 'POST':
-        user = request.user
-        print(user)
-        data = json.loads(request.body.decode('utf-8'))
-        l = data.get('lol')
-        print(data)
+        
+        try:    
+            data = json.loads(request.body.decode('utf-8'))
+        except json.JSONDecodeError:
+            return JsonResponse(
+                {
+                    'message': 'Invalid JSON',
+                    'status': 'error',
+                    'type': 'invalid_json'
+                }, status=400
+            )
+        
+        receiver_id = int(room_name)
+        
+        sender_token = data.get('sender_token')
+        
+        try:
+        # Decode the JWT token to get the payload
+            payload = jwt.decode(sender_token, settings.SECRET_KEY, algorithms=['HS256'])
+            user_id = payload['user_id']  # Assuming 'user_id' is the key in your JWT payload
+            sender = get_object_or_404(User, user_id=user_id)
+        except jwt.ExpiredSignatureError:
+            # Handle expired token error
+            raise ValueError('Token expired')
+        except jwt.InvalidTokenError:
+            # Handle invalid token error
+            raise ValueError('Invalid token')
+        except User.DoesNotExist:
+            # Handle user not found error
+            raise ValueError('User not found')
+        
+        if sender.user_id < receiver_id:
+            thread_name = f'{receiver_id}-{sender.user_id}'
+        else:
+            thread_name = f'{sender.user_id}-{receiver_id}'
+        
+            
+
+        # Fetch messages from the database filtered by thread_name
+        messages = ChatModel.objects.filter(thread_name=thread_name)
+        
+        receiver = User.objects.get(user_id=receiver_id)
+        
+        sender_req = sender.user_id
+
+        receiver_avatar = receiver.profile_picture.url if receiver.profile_picture else None
+        sender_avatar = sender.profile_picture.url if sender.profile_picture else None
+        
+        message_list = []
+        
+        for message in messages:
+            sender_username = message.sender
+            sender_id = User.objects.get(username=sender_username)
+            receiver = User.objects.get(user_id=receiver_id)
+            message_list.append({
+                'sender': sender_id.user_id,
+                'username' : sender_username,
+                'message': message.message,
+                'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+            })
+
         return JsonResponse(
-            {
-                'message': 'Username does not exist',
-                'room' : room_name
-            }, status=200)
-    # print('sdfsdfsdfsdf')
-    # user = request.user
-    # # Assuming room_name is the user_id of the other participant
-    # try:
-    #     other_user = User.objects.get(id=room_name)
-    # except User.DoesNotExist:
-    #     return JsonResponse({'error': 'User does not exist'}, status=404)
+                {
+                    'message': message_list,
+                    'sender_id' : sender_req,
+                    'receiver_avatar' : receiver_avatar,
+                    'sender_avatar' : sender_avatar
+                }, status=200
+            )
+        
+    return Response({'error': 'Invalid request method'}, status=400)
+        # print(sender)
+        # Retrieve chat messages between sender and receiver
+        # messages = ChatMessage.objects.filter(sender=sender, receiver_id=receiver_id).order_by('timestamp')
+        # serializer = ChatMessageSerializer(messages, many=True)
 
-    # # Fetch messages for the chat between the authenticated user and the other user
-    # thread_name = f"{user.id}_{room_name}"  # This can be your logic for the thread name
-    # messages = ChatModel.objects.filter(thread_name=thread_name).order_by('timestamp')
-    # messages_list = list(messages.values('sender', 'message', 'timestamp'))
+        # # Retrieve sender's and receiver's profile pictures (if available)
+        # sender_profile = get_object_or_404(UserProfile, user=sender)
+        # receiver = get_object_or_404(User, id=receiver_id)
+        # receiver_profile = get_object_or_404(UserProfile, user=receiver)
 
-    # return JsonResponse(messages_list, safe=False)
+        # # Serialize profile picture URLs (or base64 encoded images) if needed
+        # sender_avatar_url = sender_profile.profile_picture.url if sender_profile.profile_picture else None
+        # receiver_avatar_url = receiver_profile.profile_picture.url if receiver_profile.profile_picture else None
 
-
-
-
-
-
-
-#     user_obj = User.objects.get(username=username)
-#     users = User.objects.exclude(username=request.user.username)
-
-#     if request.user.user_id > user_obj.user_id:
-#         thread_name = f'chat_{request.user.id}-{user_obj.id}'
-#     else:
-#         thread_name = f'chat_{user_obj.id}-{request.user.id}'
-#     message_objs = ChatModel.objects.filter(thread_name=thread_name)
-#     return render(request, 'main_chat.html', context={'user': user_obj, 'users': users, 'messages': message_objs})
-# def chat(request):
-#     chat_group = get_object_or_404(ChatGroup, group_name = "chat")
-#     chat_messages = chat_group.chat_messages.all()[:30]
-    
-#     if request.method == 'POST':
-#         data = json.loads(request.body.decode('utf-8'))
-#         message = data.get('message')
-#         username = data.het('sender')
-#         author = User.objects.get(username=username)
-#         group = ChatGroup.objects.create(group=chat_group, author = author, body = message)
-#         group.save()
-    
-#     return JsonResponse(
-#                 {
-#                     'status': 'success',
-#                     'messages': chat_messages, 
-#                 }, status=200
-#             )
+        # return Response({
+        #     'messages': serializer.data,
+        #     'sender_avatar_url': sender_avatar_url,
+        #     'receiver_avatar_url': receiver_avatar_url
+        # })
