@@ -88,7 +88,8 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message,
-            'username': username
+            'username': username,
+            'sdfs' : 'sdfs'
         }))
         
     
