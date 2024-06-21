@@ -97,8 +97,10 @@ def chatPage(request, room_name):
             {
                 'message': message_list,
                 'sender_id': sender_req,
+                'sender_username' : sender.username,
                 'receiver_avatar': receiver_avatar,
-                'sender_avatar': sender_avatar
+                'sender_avatar': sender_avatar,
+                'receiver_username' : receiver.username
             }, status=200
         )
         

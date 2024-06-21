@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'login.apps.LoginConfig',
     'chat.apps.ChatConfig',
     'reset_password.apps.ResetPasswordConfig',
+    'user_profile.apps.UserProfileConfig',
     'corsheaders'
 ]
 

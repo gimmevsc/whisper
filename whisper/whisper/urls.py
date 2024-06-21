@@ -25,7 +25,8 @@ urlpatterns = [
     path('', include('register.urls')),
     path('', include('login.urls')),
     path('', include('reset_password.urls')),
-    path('', include('chat.urls'))
+    path('', include('chat.urls')),
+    path('', include('user_profile.urls'))
    
 ]
 
