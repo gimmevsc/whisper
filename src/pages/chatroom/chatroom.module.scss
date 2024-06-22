@@ -7,7 +7,18 @@
     .chats{
         height: 100%;
         width: 50%;
-
+        .top-bar{
+            
+            display: flex;
+            align-items: center;
+            .avatar{
+                height: 60px;
+                width: 60px;
+                border-radius: 50%;
+                object-fit: cover;
+                margin-right: 10px;
+            }
+        }
     }
     .chat{
         width: 50%;
@@ -34,12 +45,21 @@
                     width: 100%;
                     position: relative;
                     .message-data{
+                        display: flex;
+                        align-items: center;
                         position: absolute;
                         width: fit-content;
 
                         background-color: #f1c3ff;
                         margin-bottom: 10px;
                         padding: 5px;
+                        .avatar{
+                            height: 40px;
+                            width: 40px;
+                            border-radius: 50%;
+                            object-fit: cover;
+                            margin-right: 10px;
+                        }
                     }
                 }
             }

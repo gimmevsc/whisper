@@ -4,7 +4,7 @@ import Login from './pages/login/Login';
 import Reset from './pages/reset/Reset';
 import Chat from './pages/chat/Chat';
 import ChatRoom from './pages/chatroom/ChatRoom';
-
+import Profile from './pages/profile/Profile'
 import Confirmation from './pages/register/confirmation/Confirmation';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 function App() {
@@ -19,6 +19,7 @@ function App() {
         <Route path="/reset" element={<Reset />}/>
         <Route path="/chatroom/:room" element={<ChatRoom />}/>
         <Route path="/chat" element={<Chat />}/>
+        <Route path="/profile" element={<Profile />}/>
 
 
           {/* <Route index element={<Home />} />

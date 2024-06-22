@@ -19,18 +19,14 @@ function Chat() {
         const url = `${config.url}/chat/${room}`
 
         const data = {
-            "lol":"hello",
             "token" : Cookies.get('token')
         }        
 
-        // Set up WebSocket for real-time updates
-        
 
         ws.current.onopen = () => {
             console.log('WebSocket connection established');
             axios.post(url,data).then(res=>{
                 console.log("Load the page")
-                // console.log(res.data)
             }).catch(err=>console.log("what"))
         };
 
