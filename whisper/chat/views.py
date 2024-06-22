@@ -25,11 +25,11 @@ def chatPage(request, room_name):
         
         receiver_id = int(room_name)
         
-        sender_token = data.get('sender_token')
+        token = data.get('sender_token')
         
         try:
             # Decode the JWT token to get the payload
-            payload = jwt.decode(sender_token, settings.SECRET_KEY, algorithms=['HS256'])
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
             user_id = payload['user_id']  # Assuming 'user_id' is the key in your JWT payload
             sender = get_object_or_404(User, user_id=user_id)
         except jwt.ExpiredSignatureError:

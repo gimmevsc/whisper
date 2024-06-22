@@ -51,11 +51,13 @@ def loginUser(request):
                     'username': user.username,
                     'email_address' : user.email_address,
                     'first_name' : user.first_name,
-                    'last_name' : user.last_name            
+                    'last_name' : user.last_name,
+                    'bio' : user.bio,
+                    'phone_number' : user.phone_number
                 }
-                print('sdfsfsdfsdfsdf')
+
                 token = JWTAuthentication.generate_token(playload)
-                print(token)
+            
                 return JsonResponse(
                     {
                         'message': 'Login successful',
