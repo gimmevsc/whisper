@@ -1,5 +1,5 @@
 from django.contrib import admin
-from chat.models import Chat, Participant, Message, MessageMedia, ChatModel
+from chat.models import Chat, Participant, Message, MessageMedia
 
 
 class ChatAdmin(admin.ModelAdmin):
@@ -20,12 +20,6 @@ class MessageAdmin(admin.ModelAdmin):
     list_display_links = ('message_id', 'message_content')
     search_fields = ('message_id', 'message_content')
 
-# class ChatAdminsAdmin(admin.ModelAdmin):
-#     list_display = ('chat_admin_id', 'user', 'chat', 'appointed_at')
-#     list_filter = ('appointed_at',)
-#     list_display_links = ('chat_admin_id', 'user')
-#     search_fields = ('user__username', 'chat__title')
-
 class MessageMediaAdmin(admin.ModelAdmin):
     list_display = ('media_id', 'message', 'media_type', 'file_path', 'uploaded_at')
     list_filter = ('media_type', 'uploaded_at')
@@ -37,10 +31,15 @@ class ChatModelAdmin(admin.ModelAdmin):
     list_filter = ('sender', 'thread_name', 'timestamp')
     list_display_links = ('sender',)
     search_fields = ('sender', 'message', 'thread_name')
+    
+# class ChatAdminsAdmin(admin.ModelAdmin):
+#     list_display = ('chat_admin_id', 'user', 'chat', 'appointed_at')
+#     list_filter = ('appointed_at',)
+#     list_display_links = ('chat_admin_id', 'user')
+#     search_fields = ('user__username', 'chat__title')
 
 admin.site.register(Chat, ChatAdmin)
 admin.site.register(Participant, ParticipantAdmin)
 admin.site.register(Message, MessageAdmin)
 # admin.site.register(ChatAdmin, ChatAdminsAdmin)
 admin.site.register(MessageMedia, MessageMediaAdmin)
-admin.site.register(ChatModel, ChatModelAdmin)

@@ -130,7 +130,6 @@ def emailConfirmation(request):
                 }, status = 405)    
 
 
-@csrf_exempt
 def resendConfirmationCode(request):
     
     if request.method == 'GET':

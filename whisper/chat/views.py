@@ -7,7 +7,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import PermissionDenied
 from chat.models import Chat, Message, Participant
 from register.models import User
-from base64 import b64encode
+from django.core.exceptions import ObjectDoesNotExist
+from .utils import get_avatar_base64, get_users_with_shared_chats
 
 @csrf_exempt
 def chatPage(request, room_name):
@@ -23,31 +24,15 @@ def chatPage(request, room_name):
                 }, status=400
             )
 
-        token = data.get('sender_token')
+        # token = data.get('sender_token')
 
+        user_id = str(data.get('user_id'))
+        
         try:
             # Decode the JWT token to get the payload
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
-            user_id = payload['user_id']  # Assuming 'user_id' is the key in your JWT payload
+            # payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+            # user_id = payload['user_id']  # Assuming 'user_id' is the key in your JWT payload
             sender = get_object_or_404(User, user_id=user_id)
-        except jwt.ExpiredSignatureError:
-            # Handle expired token error
-            return JsonResponse(
-                {
-                    'message': 'Token expired',
-                    'status': 'error',
-                    'type': 'token_expired'
-                }, status=401
-            )
-        except jwt.InvalidTokenError:
-            # Handle invalid token error
-            return JsonResponse(
-                {
-                    'message': 'Invalid token',
-                    'status': 'error',
-                    'type': 'invalid_token'
-                }, status=401
-            )
         except User.DoesNotExist:
             # Handle user not found error
             return JsonResponse(
@@ -75,16 +60,14 @@ def chatPage(request, room_name):
 
         receiver = get_object_or_404(User, user_id=receiver_id)
 
-        def get_avatar_base64(user):
-            if user.profile_picture:
-                with open(user.profile_picture.path, "rb") as image_file:
-                    return b64encode(image_file.read()).decode('utf-8')
-            return None
-
         receiver_avatar = get_avatar_base64(receiver)
         sender_avatar = get_avatar_base64(sender)
 
         message_list = []
+
+        chats_list = []
+
+
 
         for message in messages:
             message_list.append({
@@ -110,3 +93,98 @@ def chatPage(request, room_name):
             'error': 'Invalid request method'
         }, status=400
     )
+
+
+
+def userSearch(request):
+    if request.method == 'GET':
+        try:
+            username_contains = request.GET.get('username')
+            
+            if not username_contains:
+                return JsonResponse(
+                    {
+                        'message': 'Please provide a search term'
+                    }, status=400)
+            
+            # Perform case-insensitive 'contains' search on username field
+            users = User.objects.filter(username__icontains=username_contains)
+            
+            if not users.exists():
+                return JsonResponse(
+                    {
+                        'message': 'No users found matching the search term'
+                    }, status=404)
+            
+            users_list = []
+
+            for user in users:
+                users_list.append({
+                    'user_id': user.user_id,
+                    'username': user.username,
+                    'profile_picture': get_avatar_base64(user)
+                })
+            
+            return JsonResponse(users_list, safe=False, status=200)
+        
+        except ObjectDoesNotExist:
+            return JsonResponse(
+                {
+                    'message': 'User not found'
+                }, status=200)
+        
+        except Exception as e:
+            return JsonResponse(
+                {
+                    'message': str(e)
+                }, status=500)
+    
+    else:
+        return JsonResponse(
+            {
+                'message': 'Method not allowed'
+            }, status=405)
+
+def userChats(request):
+    
+    if request.method == 'GET':
+        
+        try:
+            user_id = str(request.GET.get('user_id'))
+            print(user_id)
+            base_user = get_object_or_404(User, user_id=user_id)
+            print(base_user)
+            users_with_shared_chats = get_users_with_shared_chats(base_user)
+            
+            user_list = []
+
+            for user in users_with_shared_chats:
+                
+                user_list.append({
+                'user_id': user.user_id,
+                'username': user.username,
+                'profile_picture' : get_avatar_base64(user)
+            })  
+                print(user.user_id)
+    
+            return JsonResponse(user_list, safe=False, status=200)
+        
+        except ObjectDoesNotExist:
+        
+            return JsonResponse(
+                {
+                    'message': 'User not found'
+                }, status=404)
+        
+        except Exception as e:
+        
+            return JsonResponse(
+                {
+                    'message': str(e)
+                }, status=500)
+    else:
+        
+        return JsonResponse(
+            {
+                'message': 'Method not allowed'
+            }, status=405)
