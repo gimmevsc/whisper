@@ -134,7 +134,7 @@ def setUpProfile(request):
                 'message': 'Profile updated successfully',
                 'token': new_token
             }, status=200)
-    
+        
     return JsonResponse(
         {
             'error': 'Invalid request method'

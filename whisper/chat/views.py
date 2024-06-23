@@ -65,10 +65,6 @@ def chatPage(request, room_name):
 
         message_list = []
 
-        chats_list = []
-
-
-
         for message in messages:
             message_list.append({
                 'sender': message.sender_id,
@@ -93,7 +89,6 @@ def chatPage(request, room_name):
             'error': 'Invalid request method'
         }, status=400
     )
-
 
 
 def userSearch(request):
@@ -145,28 +140,28 @@ def userSearch(request):
                 'message': 'Method not allowed'
             }, status=405)
 
+
+
 def userChats(request):
     
     if request.method == 'GET':
         
         try:
             user_id = str(request.GET.get('user_id'))
-            print(user_id)
+            
             base_user = get_object_or_404(User, user_id=user_id)
-            print(base_user)
+            
             users_with_shared_chats = get_users_with_shared_chats(base_user)
             
             user_list = []
 
             for user in users_with_shared_chats:
-                
                 user_list.append({
                 'user_id': user.user_id,
                 'username': user.username,
                 'profile_picture' : get_avatar_base64(user)
             })  
-                print(user.user_id)
-    
+                
             return JsonResponse(user_list, safe=False, status=200)
         
         except ObjectDoesNotExist:

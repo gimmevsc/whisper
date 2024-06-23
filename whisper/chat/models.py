@@ -21,6 +21,9 @@ class Chat(models.Model):
 
     def __str__(self):
         return self.title if self.title else str(self.chat_id)
+    
+    class Meta:
+        unique_together = ('chat_type', 'title')
 
 # Participant model
 class Participant(models.Model):

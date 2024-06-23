@@ -6,7 +6,7 @@ from .utils import send_verification_code, is_valid_email_funct, is_code_expired
 import json 
 import threading
 from django.contrib.auth.hashers import make_password
-
+from chat.models import Chat
 from .models import User, PreRegistration
 from django.db.models import Q
 
@@ -104,6 +104,9 @@ def emailConfirmation(request):
             user = User.objects.create(username=pre_user.username, email_address=pre_user.email_address, password=pre_user.password)
             user.save()
             
+            # saved_messages = Chat.objects.create(chat_type='saved_messages', title=f'{user.user_id}-{user.user_id}')
+            # saved_messages.save()
+            
             pre_user.delete()
             
             return JsonResponse(
@@ -147,6 +150,7 @@ def resendConfirmationCode(request):
             pre_user.code = str(new_code)
             pre_user.code_sent_at = timezone.now()
             pre_user.save()
+            
             
             return JsonResponse(
                 {
