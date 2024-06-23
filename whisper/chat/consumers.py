@@ -3,7 +3,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from django.conf import settings
 from django.contrib.auth import get_user_model
 import jwt
-from .models import ChatModel, ChatGroup, GroupMessage
+from .models import *
 from chat.tokenauthentication import JWTAuthentication
 from asgiref.sync import sync_to_async  # Import sync_to_async
 
@@ -27,19 +27,22 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
             return
         
         # Get the other user ID from the URL route
-        other_user_id = self.scope['url_route']['kwargs']['user_id']
+        other_user_id = int(self.scope['url_route']['kwargs']['user_id'])
         # user = self.scope['user']
         # Determine the room name based on user IDs
-        my_id = self.scope['user'].user_id
+        my_id = int(self.scope['user'].user_id)
         
-        if int(my_id) > int(other_user_id):
-            self.room_name = f'{my_id}-{other_user_id}'
-        else:
-            self.room_name = f'{other_user_id}-{my_id}'
+        self.room_group_name = f'{min(my_id, other_user_id)}-{max(my_id, other_user_id)}'
         
-        self.room_group_name = f'chat_{self.room_name}'
+        chat, created = await sync_to_async(Chat.objects.get_or_create)(
+            chat_type='personal', 
+            title=self.room_group_name
+        )
+        
+        my_participant, created_my_participant = await sync_to_async(Participant.objects.get_or_create)(user_id=my_id, chat=chat)
+        other_participant, created_other_participant = await sync_to_async(Participant.objects.get_or_create)(user_id=other_user_id, chat=chat)
+        
         # Add the channel to the group
-        # print(self.room_group_name, user)
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
@@ -73,11 +76,11 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
 
 
     async def save_message(self, message):
-        # Save the message to the database
-        await sync_to_async(ChatModel.objects.create)(
-            sender=self.scope['user'].username,
-            message=message,
-            thread_name=self.room_name
+        chat = await sync_to_async(Chat.objects.get)(title=self.room_group_name)
+        await sync_to_async(Message.objects.create)(
+            chat=chat,
+            sender=self.scope['user'],
+            message_content=message
         )
 
     

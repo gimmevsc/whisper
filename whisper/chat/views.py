@@ -3,16 +3,16 @@ import jwt
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
-from chat.models import ChatModel
-from register.models import User  # Assuming User is in register.models
+from django.core.exceptions import PermissionDenied
+from chat.models import Chat, Message, Participant
+from register.models import User
 from base64 import b64encode
 
 @csrf_exempt
 def chatPage(request, room_name):
     if request.method == 'POST':
-        try:    
+        try:
             data = json.loads(request.body.decode('utf-8'))
         except json.JSONDecodeError:
             return JsonResponse(
@@ -22,11 +22,9 @@ def chatPage(request, room_name):
                     'type': 'invalid_json'
                 }, status=400
             )
-        
-        receiver_id = int(room_name)
-        
+
         token = data.get('sender_token')
-        
+
         try:
             # Decode the JWT token to get the payload
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
@@ -59,18 +57,23 @@ def chatPage(request, room_name):
                     'type': 'user_not_found'
                 }, status=404
             )
-        
-        if sender.user_id < receiver_id:
-            thread_name = f'{receiver_id}-{sender.user_id}'
-        else:
-            thread_name = f'{sender.user_id}-{receiver_id}'
 
-        # Fetch messages from the database filtered by thread_name
-        messages = ChatModel.objects.filter(thread_name=thread_name)
-        
+        receiver_id = int(room_name)
+
+        # Determine the thread name based on user IDs
+        thread_name = f'{min(sender.user_id, receiver_id)}-{max(sender.user_id, receiver_id)}'
+
+        # Get or create the chat
+        chat, created = Chat.objects.get_or_create(chat_type='personal', title=thread_name)
+
+        # Fetch or create participants
+        # my_participant, created_my_participant = Participant.objects.get_or_create(user_id=sender.user_id, chat=chat)
+        # other_participant, created_other_participant = Participant.objects.get_or_create(user_id=receiver_id, chat=chat)
+
+        # Fetch messages from the database filtered by chat
+        messages = Message.objects.filter(chat=chat).order_by('sent_at')
+
         receiver = get_object_or_404(User, user_id=receiver_id)
-        
-        sender_req = sender.user_id
 
         def get_avatar_base64(user):
             if user.profile_picture:
@@ -80,30 +83,28 @@ def chatPage(request, room_name):
 
         receiver_avatar = get_avatar_base64(receiver)
         sender_avatar = get_avatar_base64(sender)
-        
+
         message_list = []
-        
+
         for message in messages:
-            sender_username = message.sender
-            sender_id = get_object_or_404(User, username=sender_username)
             message_list.append({
-                'sender': sender_id.user_id,
-                'username': sender_username,
-                'message': message.message,
-                'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+                'sender': message.sender_id,
+                'username': message.sender.username,
+                'message': message.message_content,
+                'timestamp': message.sent_at.strftime('%Y-%m-%d %H:%M:%S')
             })
 
         return JsonResponse(
             {
                 'message': message_list,
-                'sender_id': sender_req,
-                'sender_username' : sender.username,
+                'sender_id': sender.user_id,
+                'sender_username': sender.username,
                 'receiver_avatar': receiver_avatar,
                 'sender_avatar': sender_avatar,
-                'receiver_username' : receiver.username
+                'receiver_username': receiver.username
             }, status=200
         )
-        
+
     return JsonResponse(
         {
             'error': 'Invalid request method'
