@@ -15,7 +15,7 @@ function App() {
         <Route path="/" element={<Login />}/>
         <Route path="/login" element={<Login />}/>
         <Route path="/register" element={<Register />}/>
-        <Route path="/register/confirmation" element={<Confirmation />}/>
+        <Route path="/register/confirmation" element={<Confirmation />}/> 
         <Route path="/reset" element={<Reset />}/>
         <Route path="/chatroom/:room" element={<ChatRoom />}/>
         <Route path="/chat" element={<Chat />}/>

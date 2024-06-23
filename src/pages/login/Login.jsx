@@ -6,6 +6,7 @@ import Input from "../../components/Input";
 import { Link,useNavigate } from "react-router-dom";
 import axios from "axios";
 import config from "../../config.json"
+import decodeToken from '../../utils/decodeToken'
 function Login() {
     
     const navigate = useNavigate()
@@ -13,7 +14,6 @@ function Login() {
     const [isAnimation, setIsAnimation] = useState(false)
     const [fields, setFields] = useState(['', ''])
     const labels = [["Username or email", 'text'], ["Password", 'password']];
-
     function focusHandler(i) {
 
         setPressed(prev => {
@@ -32,11 +32,12 @@ function Login() {
         }
         axios.post(url,data).then(res=>{
             Cookies.set('token', res.data.token, { expires: 30 }); // Expires in 30 days
-            Cookies.set("email",fields[0]);
-            navigate("/chat")
+            // Cookies.set("email",fields[0]);
+            const id = decodeToken(Cookies.get('token')).user_id
+            navigate(`/chatroom/${id}`)
         }).catch(err=>alert(err))
     }
-
+ 
     function toRegisterHandler(){
         setIsAnimation(true)
         setTimeout(() => {

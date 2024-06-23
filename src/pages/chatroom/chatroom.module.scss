@@ -8,15 +8,61 @@
         height: 100%;
         width: 50%;
         .top-bar{
-            
             display: flex;
-            align-items: center;
-            .avatar{
-                height: 60px;
-                width: 60px;
-                border-radius: 50%;
-                object-fit: cover;
-                margin-right: 10px;
+            .profile{
+                display: flex;
+                align-items: center;
+                .avatar{
+                    height: 60px;
+                    width: 60px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    margin-right: 10px;
+                }
+            }
+            .search{
+                display: flex;
+                flex-direction: column;
+                .search-bar{
+
+                }
+                .search-users{
+                    display: flex;
+                    flex-direction: column;
+                    .search-item{
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+                        margin-top: 10px;
+                        .user-avatar{
+                            img{
+                                height: 40px;
+                                width: 40px;
+                                border-radius: 50%;
+                            }
+                        }
+
+
+                    }
+                }
+            }
+        }
+        .chats-box{
+            display: flex;
+            flex-direction: column;
+            .chat{
+                cursor: pointer;
+                border: 1px solid black;
+
+                display: flex;
+                flex-direction: row;
+                .user-avatar{
+                    img{
+                        height: 50px;
+                        width: 50px;
+                        border-radius: 50%;
+                    }
+                }
             }
         }
     }
