@@ -32,25 +32,19 @@ class PersonalChatConsumer(AsyncWebsocketConsumer):
         # Determine the room name based on user IDs
         my_id = int(self.scope['user'].user_id)        
         
+        self.room_group_name = f'{min(my_id, other_user_id)}-{max(my_id, other_user_id)}'
+        title = self.room_group_name
+        
         if other_user_id == my_id:
-            print(other_user_id, my_id)
             chat_type = 'saved_messages'
-            self.room_group_name = f'saved_{my_id}'
-            title = self.room_group_name
         else:
             chat_type = 'personal'
-            print('second')
-            self.room_group_name = f'{min(my_id, other_user_id)}-{max(my_id, other_user_id)}'
-            title = self.room_group_name
-        
-        print(chat_type)
+                        
         # Get or create the chat based on type and title
         try:
             chat = await sync_to_async(Chat.objects.get)(chat_type=chat_type, title=title)
-            print('sdfsfsfsfds', chat_type)
         except Chat.DoesNotExist:
             chat = await sync_to_async(Chat.objects.create)(chat_type=chat_type, title=title)
-            print('1231231312', chat_type)
         
         # Create participants for the chat
         my_participant, created_my_participant = await sync_to_async(Participant.objects.get_or_create)(user_id=my_id, chat=chat)

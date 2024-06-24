@@ -48,13 +48,15 @@ def chatPage(request, room_name):
         # Determine the thread name based on user IDs
         thread_name = f'{min(sender.user_id, receiver_id)}-{max(sender.user_id, receiver_id)}'
 
+        if sender.user_id == receiver_id:
+            chat_type = 'saved_messages'
+        else:
+            chat_type = 'personal'
         # Get or create the chat
-        chat, created = Chat.objects.get_or_create(chat_type='personal', title=thread_name)
-
+        chat = Chat.objects.get(chat_type=chat_type, title=thread_name)
         # Fetch or create participants
         # my_participant, created_my_participant = Participant.objects.get_or_create(user_id=sender.user_id, chat=chat)
         # other_participant, created_other_participant = Participant.objects.get_or_create(user_id=receiver_id, chat=chat)
-
         # Fetch messages from the database filtered by chat
         messages = Message.objects.filter(chat=chat).order_by('sent_at')
 
@@ -153,6 +155,8 @@ def userChats(request):
             
             users_with_shared_chats = get_users_with_shared_chats(base_user)
             
+            chat = Chat.objects.get(chat_type='saved_messages', title=f'{user_id}-{user_id}')
+
             user_list = []
 
             for user in users_with_shared_chats:
@@ -162,7 +166,10 @@ def userChats(request):
                 'profile_picture' : get_avatar_base64(user)
             })  
                 
-            return JsonResponse(user_list, safe=False, status=200)
+            return JsonResponse({
+                'saved_messages_chat_id' : chat.chat_id,
+                'user_list' : user_list 
+                }, status=200)
         
         except ObjectDoesNotExist:
         
