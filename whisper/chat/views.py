@@ -97,6 +97,7 @@ def userSearch(request):
     if request.method == 'GET':
         try:
             username_contains = request.GET.get('username')
+            logged_user_id = request.GET.get('user_id')
             
             if not username_contains:
                 return JsonResponse(
@@ -105,7 +106,7 @@ def userSearch(request):
                     }, status=400)
             
             # Perform case-insensitive 'contains' search on username field
-            users = User.objects.filter(username__icontains=username_contains)
+            users = User.objects.filter(username__icontains=username_contains).exclude(user_id=logged_user_id)
             
             if not users.exists():
                 return JsonResponse(
@@ -154,8 +155,6 @@ def userChats(request):
             base_user = get_object_or_404(User, user_id=user_id)
             
             users_with_shared_chats = get_users_with_shared_chats(base_user)
-            
-            chat = Chat.objects.get(chat_type='saved_messages', title=f'{user_id}-{user_id}')
 
             user_list = []
 
@@ -166,10 +165,7 @@ def userChats(request):
                 'profile_picture' : get_avatar_base64(user)
             })  
                 
-            return JsonResponse({
-                'saved_messages_chat_id' : chat.chat_id,
-                'user_list' : user_list 
-                }, status=200)
+            return JsonResponse(user_list, safe=False, status=200)
         
         except ObjectDoesNotExist:
         
