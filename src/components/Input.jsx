@@ -38,7 +38,8 @@ function Input(props) {
                 <div onClick={passwordHandler} className={style.password_btn}>
                         <img src={eye_open} className={isHide?style.hidden:""} style={{top:"2px"}} alt="" />
                         <img src={eye_close} className={!isHide?style.hidden:""} alt="" />                    
-                </div>}
+                </div>
+            }
         </div>
     )
 }

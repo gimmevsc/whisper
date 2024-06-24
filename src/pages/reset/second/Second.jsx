@@ -27,7 +27,9 @@ function Second(props){
                 'code':fields[0],
                 'new_password':fields[1]
             }
-            axios.post(url,data).then(res=>res.data).then(res=>console.log(res)).catch(err=>console.log(err));
+            axios.post(url,data).then(res=>res.data).then(res=>{
+                navigate('/login')
+            }).catch(err=>console.log(err));
     }
     
 

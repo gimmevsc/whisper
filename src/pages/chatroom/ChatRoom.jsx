@@ -7,17 +7,21 @@ import config from '../../config.json';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import style from "./chatroom.module.scss"
 import decodeToken from "../../utils/decodeToken";
+import ChatComponent from "./chatComponent/ChatComponent";
 function ChatRoom() {
     const navigate = useNavigate()
 
     const [messages, setMessages] = useState([]);
-    const [sender, setSender] = useState("");
+    // const [sender, setSender] = useState("");
+    const sender = useRef('');
     const [receiver, setReceiver] = useState("");
     const [receiverUsername, setReceiverUsername] = useState("");
-    const [senderUsername, setSenderUsername] = useState("");
+    // const [senderUsername, setSenderUsername] = useState("");
+    const senderUsername = useRef('')
     const [searchUsers, setSearchUsers] = useState([])
     const [search, setSearch] = useState('')
-    const [loaded, setLoaded] = useState(false)
+    // const [loaded, setLoaded] = useState(false)
+    const loaded = useRef(false)
     const [userChats, setUserChats] = useState([])
     const messageInput = useRef();
     const [senderImg, setSenderImg] = useState(null);
@@ -25,10 +29,13 @@ function ChatRoom() {
     const { room } = useParams(); // Replace with dynamic room name as needed
     const messagesRef = useRef(null)
     const ws = useRef(null);
-    const getChats = () => {
-        const URL = `${config.url}/userchats?user_id=${sender}`
+    const getChats = () => { 
+        const URL = `${config.url}/userchats?user_id=${sender.current}`
+
         axios.get(URL).then((res) => {
-            setUserChats(res.data)
+            setUserChats([{"user_id":sender.current,'profile_picture':senderImg,'username':"SAVED MESSAGES"},...res.data])
+            console.log("chats received")
+            console.log(res.data)
         }).catch(err => {
             // setUserChats([])
             console.log(err)
@@ -39,7 +46,9 @@ function ChatRoom() {
 
         const data = {
             "receiver": room,
-            "user_id": sender
+            // "user_id": sender
+            "user_id": sender.current
+
         }
         axios.post(url, data).then(res => {
 
@@ -49,10 +58,11 @@ function ChatRoom() {
             setReceiverUsername(res.data.receiver_username)
             setReceiverImg(res.data.receiver_avatar);
             setMessages(res.data.message)
+            console.log('Chat is loaded')
+            console.log(res.data)
+
         }).then(() => {
-
             scrollToBottom()
-
         }).catch(err => console.log(err))
     }
     const wsHandler = () => {
@@ -60,17 +70,14 @@ function ChatRoom() {
 
         ws.current.onopen = () => {
             console.log('WebSocket connection established');
-
-
+            chatHandler()
 
         };
 
         ws.current.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            // console.log(event.data)
             setMessages(prevMessages => [...prevMessages, data]);
             scrollToBottom()
-
         };
 
         ws.onclose = () => {
@@ -84,27 +91,32 @@ function ChatRoom() {
 
 
     useEffect(() => {
-        if(!loaded){
+        console.log("useEffect")
+        if(!loaded.current){
+            console.log("loading first time")
             const token = Cookies.get('token')
             const decoded = decodeToken(token);
             console.log(decoded)
-            setSender(decoded.user_id)
-            setSenderUsername(decoded.username)
+            sender.current = decoded.user_id
             
+            senderUsername.current = decoded.username
+            getChats()
             
         }
-        getChats()
-        chatHandler()
-
+        
+        
+    
         wsHandler()
-
-        setLoaded(true)
-
-        // Clean up the WebSocket connection when the component is unmounted
+    
+        
+        
+        // setLoaded(true)
+        loaded.current = true;
+        
         return () => {
             ws.current.close();
         };
-    }, [room,sender]);
+    }, [room]);
     const scrollToBottom = () => {
         setTimeout(() => {
             messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
@@ -117,7 +129,7 @@ function ChatRoom() {
     }
     function searchHandler(event) {
         setSearch(event.target.value)
-        const URL = `${config.url}/search?username=${event.target.value}`;
+        const URL = `${config.url}/search?username=${event.target.value}&user_id=${sender.current}`;
         if (event.target.value !== "") {
             axios.get(URL).then(res => {
                 console.log(res.data)
@@ -139,16 +151,16 @@ function ChatRoom() {
             <div className={style["chats"]}>
                 <div className={style["top-bar"]}>
                     <a href="/profile" className={style["profile"]}>
-                        <img className={style["avatar"]} src={senderImg ? `data:image/jpeg;base64,${senderImg}` : avatar} alt={senderUsername} />
-                        <div className={style["text"]}>{senderUsername}</div>
+                        <img className={style["avatar"]} src={senderImg ? `data:image/jpeg;base64,${senderImg}` : avatar} alt={senderUsername.current} />
+                        <div className={style["text"]}>{senderUsername.current}</div>
 
                     </a>
                     <div className={style["search"]}>
                         <input type="text" className={style['search-bar']} value={search} onChange={searchHandler} />
                         <div className={style["search-users"]}>
                             {
-                                searchUsers.map(user =>
-                                    <div className={style["search-item"]}>
+                                searchUsers.map((user,i) =>
+                                    <div className={`${style["search-item"]}`} key={i}>
                                         <div className={style["user-avatar"]}>
                                             <img src={user.profile_picture ? `data:image/jpeg;base64,${user.profile_picture}` : avatar} alt={user.username} />
                                         </div>
@@ -166,8 +178,8 @@ function ChatRoom() {
                 </div>
                 <div className={style["chats-box"]}>
                         {
-                            userChats.map(chat=>
-                                <div className={style["chat"]} onClick={()=>{navigate(`/chatroom/${chat.user_id}`)}}>
+                            userChats.map((chat,i)=>
+                                <div key={i} className={`${style["chat"]} ${chat.user_id==room?style.active:""}`} onClick={()=>{navigate(`/chatroom/${chat.user_id}`)}}>
                                     <div className={style["user-avatar"]}>
                                         <img src={chat.profile_picture ? `data:image/jpeg;base64,${chat.profile_picture}` : avatar} alt="" />
                                     </div>
@@ -181,35 +193,18 @@ function ChatRoom() {
                 <div className="logout">
                     <button onClick={logoutHandler}>Log out</button>
                 </div>
-            </div>
+            </div> 
 
-            <div className={style["chat"]}>
-                <div className="top-bar">
-                    {receiverUsername}
-                </div>
-                <div className={style["bot"]}>
-                    <div className={style["messages"]} ref={messagesRef}>
-                        {messages.map((msg, index) => (
-                            <div key={index} className={style.message}>
-                                <div className={style["message-data"]} style={msg.sender == sender ? { right: 0 } : {}}>
-                                    {msg.sender != sender && <img className={style.avatar} src={receiverImg ? `data:image/jpeg;base64,${receiverImg}` : avatar} alt={msg.username} />}
-                                    <div className={style["text"]}>{msg.message}</div>
-                                </div>
-                                <div className={style["message-data"]} style={{ opacity: 0, position: "relative" }}>
-                                    {msg.sender != sender && <img className={style.avatar} src={receiverImg ? `data:image/jpeg;base64,${receiverImg}` : avatar} alt={msg.username} />}
-                                    <div className={style["text"]}>{msg.message}</div>
-                                </div>
-
-                            </div>
-                        ))}
-                    </div>
-                    <div className={style['input-box']}>
-                        <input className={style.input} type="text" ref={messageInput} onKeyDown={(e) => { if (e.key == "Enter") sendMessageHandler() }} />
-                        <button className={style["send-btn"]} onClick={sendMessageHandler}>Send</button>
-                    </div>
-                </div>
-
-            </div>
+            <ChatComponent messages={messages}
+                           style={style}
+                           receiverImg={receiverImg}
+                           receiverUsername={receiverUsername}
+                           messagesRef={messagesRef}
+                           sender={sender}
+                           messageInput={messageInput}
+                           sendMessageHandler={sendMessageHandler} 
+                           room={room}
+            />
         </div>
     );
 }

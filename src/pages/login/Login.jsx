@@ -14,6 +14,7 @@ function Login() {
     const [isAnimation, setIsAnimation] = useState(false)
     const [fields, setFields] = useState(['', ''])
     const labels = [["Username or email", 'text'], ["Password", 'password']];
+    const [error,setError] = useState('')
     function focusHandler(i) {
 
         setPressed(prev => {
@@ -31,11 +32,15 @@ function Login() {
             "password":fields[1]
         }
         axios.post(url,data).then(res=>{
-            Cookies.set('token', res.data.token, { expires: 30 }); // Expires in 30 days
-            // Cookies.set("email",fields[0]);
+            Cookies.set('token', res.data.token); // Expires in 30 days
+            
             const id = decodeToken(Cookies.get('token')).user_id
             navigate(`/chatroom/${id}`)
-        }).catch(err=>alert(err))
+        }).catch(err=>{
+            console.log(err.response.data.message)
+            setError(err.response.data.message)
+
+        })
     }
  
     function toRegisterHandler(){
@@ -57,7 +62,7 @@ function Login() {
 
             <h1 className={style.title}>Welcome back!</h1>
             <div className={style.create_text}>Create an account or Log in</div>
-            <div className={style.inputs}>
+            <div className={style.inputs} onKeyDown={(e)=>{if(e.key==="Enter")loginHandler()}}>
                 {
                     labels.map((n, i) =>
                         <Input key={i} style={style} index={i} c={[fields, setFields]} isAnimation={isAnimation && i==1} field={fields} pressed={pressed} name={n[0]} inputType={n[1]} focusHandler={() => focusHandler(i)} onClickOutside={() => onClickOutsideHandler(i)} />
@@ -70,6 +75,9 @@ function Login() {
                 <div className={`${style.forgot_password} ${isAnimation?style.forgot_password_animation:""}`}>
                     <a href="/reset">Forgot your password?</a>
                     
+                </div>
+                <div className={style["errors"]}>
+                    {error}
                 </div>
             </div>
             <div className={`${style.buttons} ${isAnimation?style.buttons_animation:""}`}>

@@ -22,7 +22,7 @@ function Register(){
             'username':fields[1],
             'password':fields[2]
         }
-        localStorage.setItem("email",data['email_address'])
+        sessionStorage.setItem("email",data['email_address'])
         axios.post(url,data).then(res=>res.data).then(res=>console.log(res)).catch(err=>console.log(err));
 
         navigate("/register/confirmation")
